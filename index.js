@@ -16,12 +16,16 @@ let facebookBot = null;
 
 // Initialize Facebook bot if credentials are available
 if (process.env.FACEBOOK_PAGE_ACCESS_TOKEN && process.env.FACEBOOK_VERIFY_TOKEN) {
+  const BusinessConfig = require('./business-config');
+  const businessConfig = BusinessConfig.getDemoConfig();
+
   facebookBot = new FacebookMessengerBot(
     process.env.FACEBOOK_PAGE_ACCESS_TOKEN,
     process.env.FACEBOOK_VERIFY_TOKEN,
-    process.env.SHOP_NAME || 'Your Shop'
+    process.env.SHOP_NAME || 'Your Shop',
+    businessConfig
   );
-  console.log('Facebook Messenger bot initialized');
+  console.log('🤖 AI-powered Facebook Messenger bot initialized with demo config');
 }
 
 // Store customer interactions for follow-up
@@ -314,11 +318,22 @@ app.post('/config/facebook', (req, res) => {
   process.env.FACEBOOK_VERIFY_TOKEN = verify_token;
   if (shop_name) process.env.SHOP_NAME = shop_name;
 
-  // Reinitialize Facebook bot
+  // Reinitialize Facebook bot with business configuration
+  const BusinessConfig = require('./business-config');
+  let businessConfig = null;
+
+  // Try to get existing business config or use demo
+  try {
+    businessConfig = facebookBot ? facebookBot.businessConfig : BusinessConfig.getDemoConfig();
+  } catch (error) {
+    businessConfig = BusinessConfig.getDemoConfig();
+  }
+
   facebookBot = new FacebookMessengerBot(
     page_access_token,
     verify_token,
-    shop_name || process.env.SHOP_NAME || 'Your Shop'
+    shop_name || process.env.SHOP_NAME || 'Your Shop',
+    businessConfig
   );
 
   res.json({
