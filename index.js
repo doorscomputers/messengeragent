@@ -128,6 +128,116 @@ app.get('/interactions', (req, res) => {
   });
 });
 
+// Get AI-powered leads dashboard
+app.get('/leads', (req, res) => {
+  try {
+    if (!facebookBot || !facebookBot.leadManager) {
+      return res.status(400).json({ error: 'Lead manager not available' });
+    }
+
+    const filter = {
+      urgency: req.query.urgency,
+      status: req.query.status
+    };
+
+    const leads = facebookBot.leadManager.getAllLeads(filter);
+    const analytics = facebookBot.leadManager.getAnalytics();
+
+    res.json({
+      success: true,
+      analytics: analytics,
+      leads: leads,
+      totalLeads: leads.length
+    });
+  } catch (error) {
+    console.error('Leads endpoint error:', error);
+    res.status(500).json({ error: 'Failed to fetch leads' });
+  }
+});
+
+// Get specific lead details
+app.get('/leads/:leadId', (req, res) => {
+  try {
+    if (!facebookBot || !facebookBot.leadManager) {
+      return res.status(400).json({ error: 'Lead manager not available' });
+    }
+
+    const leadId = req.params.leadId;
+    const lead = facebookBot.leadManager.leads.get(leadId);
+
+    if (!lead) {
+      return res.status(404).json({ error: 'Lead not found' });
+    }
+
+    res.json({
+      success: true,
+      lead: lead
+    });
+  } catch (error) {
+    console.error('Lead detail error:', error);
+    res.status(500).json({ error: 'Failed to fetch lead details' });
+  }
+});
+
+// Get business configuration
+app.get('/config/business', (req, res) => {
+  try {
+    if (!facebookBot) {
+      return res.status(400).json({ error: 'Bot not configured' });
+    }
+
+    res.json({
+      success: true,
+      config: facebookBot.businessConfig
+    });
+  } catch (error) {
+    console.error('Business config error:', error);
+    res.status(500).json({ error: 'Failed to fetch business config' });
+  }
+});
+
+// Update business configuration
+app.post('/config/business', (req, res) => {
+  try {
+    const BusinessConfig = require('./business-config');
+    const config = new BusinessConfig();
+
+    // Update configuration from request
+    if (req.body.basicInfo) {
+      config.updateBasicInfo(
+        req.body.basicInfo.shopName,
+        req.body.basicInfo.businessType,
+        req.body.basicInfo.location,
+        req.body.basicInfo.description
+      );
+    }
+
+    if (req.body.products) {
+      req.body.products.forEach(product => config.addProduct(product));
+    }
+
+    if (req.body.faqs) {
+      req.body.faqs.forEach(faq => config.addFAQ(faq.question, faq.answer, faq.keywords));
+    }
+
+    // Reinitialize bot with new configuration
+    if (facebookBot) {
+      facebookBot.businessConfig = config.getAIConfig();
+      facebookBot.aiEngine = new (require('./ai-engine'))(facebookBot.businessConfig);
+      console.log('🔄 Business configuration updated');
+    }
+
+    res.json({
+      success: true,
+      message: 'Business configuration updated',
+      config: config.getAIConfig()
+    });
+  } catch (error) {
+    console.error('Business config update error:', error);
+    res.status(500).json({ error: 'Failed to update business config' });
+  }
+});
+
 // Facebook Messenger webhook verification (GET)
 app.get('/webhook/facebook', (req, res) => {
   const mode = req.query['hub.mode'];

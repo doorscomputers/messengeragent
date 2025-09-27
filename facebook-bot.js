@@ -1,13 +1,27 @@
 // Facebook Messenger Bot Integration
 const axios = require('axios');
 const ShopeeBot = require('./bot-logic');
+const AIEngine = require('./ai-engine');
+const BusinessConfig = require('./business-config');
+const LeadManager = require('./lead-manager');
 
 class FacebookMessengerBot {
-  constructor(pageAccessToken, verifyToken, shopName) {
+  constructor(pageAccessToken, verifyToken, shopName, businessConfig = null) {
     this.pageAccessToken = pageAccessToken;
     this.verifyToken = verifyToken;
     this.bot = new ShopeeBot(shopName);
     this.apiUrl = 'https://graph.facebook.com/v18.0/me/messages';
+
+    // Initialize AI Engine with business configuration
+    this.businessConfig = businessConfig || BusinessConfig.getDemoConfig();
+    this.aiEngine = new AIEngine(this.businessConfig);
+    this.leadManager = new LeadManager({
+      autoCapture: true,
+      scoreThreshold: 25
+    });
+
+    console.log('🤖 AI-powered Facebook Messenger Bot initialized');
+    console.log(`📊 Loaded ${this.businessConfig.products.length} products and ${this.businessConfig.faqs.length} FAQs`);
   }
 
   // Verify webhook (required by Facebook)
@@ -129,7 +143,7 @@ class FacebookMessengerBot {
     }
   }
 
-  // Enhanced response with quick replies for common actions
+  // Enhanced AI-powered message processing
   async processEnhancedMessage(event) {
     try {
       const senderId = event.sender.id;
@@ -137,30 +151,66 @@ class FacebookMessengerBot {
 
       if (!messageText) return;
 
+      console.log(`🔍 Processing message from ${senderId}: "${messageText}"`);
+
       const senderInfo = await this.getSenderInfo(senderId);
       const userName = senderInfo.first_name || 'there';
 
-      // Process with bot logic
-      const response = this.bot.processMessage(messageText, userName);
-      const category = this.bot.categorizeMessage(messageText);
+      // Process with AI Engine for intelligent responses
+      const aiResponse = await this.aiEngine.processIntelligentMessage(
+        messageText,
+        senderId,
+        userName
+      );
 
-      // Send response with quick replies based on category
-      if (category === 'greeting') {
-        await this.sendQuickReply(senderId, response, [
-          { title: '💰 Check Prices', payload: 'PRICES' },
-          { title: '📦 Check Stock', payload: 'STOCK' },
-          { title: '🚚 Shipping Info', payload: 'SHIPPING' },
-          { title: '🛒 Browse Products', payload: 'BROWSE' }
-        ]);
+      console.log(`🤖 AI Response: ${aiResponse.response}`);
+      console.log(`📊 Lead Score: ${aiResponse.leadData?.score || 0}`);
+
+      // Send AI-generated response
+      if (aiResponse.quickReplies && aiResponse.quickReplies.length > 0) {
+        await this.sendQuickReply(senderId, aiResponse.response, aiResponse.quickReplies);
       } else {
-        await this.sendMessage(senderId, response);
+        await this.sendMessage(senderId, aiResponse.response);
       }
 
-      // Log interaction
-      return this.bot.logCustomerInteraction(userName, messageText, response);
+      // Process lead information
+      const leadResult = await this.leadManager.processLead(senderId, {
+        message: messageText,
+        userName: userName,
+        senderInfo: senderInfo
+      }, aiResponse);
+
+      // Handle lead capture
+      if (leadResult.leadCaptured) {
+        console.log(`🎯 Lead captured! Score: ${leadResult.leadData.score}, Urgency: ${leadResult.leadData.urgencyLevel}`);
+
+        // Send lead notification to business owner (optional)
+        if (leadResult.leadData.urgencyLevel === 'high') {
+          console.log(`🚨 HIGH PRIORITY LEAD: ${leadResult.leadData.name} - ${leadResult.recommendation.timing}`);
+        }
+      }
+
+      // Return enhanced interaction data
+      return {
+        ...this.bot.logCustomerInteraction(userName, messageText, aiResponse.response),
+        aiAnalysis: {
+          score: aiResponse.leadData?.score || 0,
+          urgency: aiResponse.leadData?.urgencyLevel || 'low',
+          shouldCapture: aiResponse.shouldCaptureLead || false
+        },
+        leadResult: leadResult
+      };
 
     } catch (error) {
-      console.error('Error in enhanced message processing:', error);
+      console.error('Error in AI message processing:', error);
+
+      // Fallback to simple bot
+      const senderInfo = await this.getSenderInfo(event.sender.id);
+      const userName = senderInfo.first_name || 'there';
+      const fallbackResponse = this.bot.processMessage(event.message?.text, userName);
+
+      await this.sendMessage(event.sender.id, fallbackResponse);
+      return this.bot.logCustomerInteraction(userName, event.message?.text, fallbackResponse);
     }
   }
 
