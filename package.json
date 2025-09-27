@@ -1,27 +1,23 @@
 {
-  "name": "shopee-hello-bot",
+  "name": "messengeragent",
   "version": "1.0.0",
-  "description": "Facebook Messenger bot for marketplace sellers",
+  "description": "Facebook Messenger Bot for Marketplace",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon index.js"
   },
-  "keywords": ["facebook", "messenger", "bot", "marketplace", "shopee"],
+  "keywords": ["facebook", "messenger", "bot", "marketplace"],
   "author": "Your Name",
   "license": "ISC",
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18.0.0"
   },
   "dependencies": {
-    "axios": "^1.6.0",
-    "body-parser": "^1.20.2",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.0",
-    "express": "^4.18.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.0"
+    "axios": "1.6.0",
+    "body-parser": "1.20.2",
+    "cors": "2.8.5",
+    "dotenv": "16.3.1",
+    "express": "4.18.2"
   }
 }
