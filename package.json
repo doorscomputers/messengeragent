@@ -1,23 +1,19 @@
 {
   "name": "messengeragent",
   "version": "1.0.0",
-  "description": "Facebook Messenger Bot for Marketplace",
+  "description": "Facebook Messenger Bot",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
-  },
-  "keywords": ["facebook", "messenger", "bot", "marketplace"],
-  "author": "Your Name",
-  "license": "ISC",
-  "engines": {
-    "node": ">=18.0.0"
+    "start": "node index.js"
   },
   "dependencies": {
-    "axios": "1.6.0",
-    "body-parser": "1.20.2",
-    "cors": "2.8.5",
-    "dotenv": "16.3.1",
-    "express": "4.18.2"
+    "axios": "^1.5.0",
+    "express": "^4.18.0",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.0",
+    "dotenv": "^16.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
