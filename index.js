@@ -101,21 +101,59 @@ app.post('/webhook/shopee/chat', (req, res) => {
 });
 
 // Manual test endpoint for bot responses
-app.post('/test/message', (req, res) => {
+app.post('/test/message', async (req, res) => {
   const { message, userName = 'TestUser' } = req.body;
 
   if (!message) {
     return res.status(400).json({ error: 'Message is required' });
   }
 
-  const response = bot.processMessage(message, userName);
-  const interaction = bot.logCustomerInteraction(userName, message, response);
+  try {
+    // Use AI-powered Facebook bot if available
+    if (facebookBot && facebookBot.aiEngine) {
+      const userId = 'test_user_' + Date.now();
 
-  res.json({
-    input: message,
-    response: response,
-    interaction: interaction
-  });
+      // Simulate Facebook message event
+      const mockEvent = {
+        sender: { id: userId },
+        message: { text: message }
+      };
+
+      const interaction = await facebookBot.processEnhancedMessage(mockEvent);
+
+      res.json({
+        input: message,
+        response: interaction?.botResponse || 'AI response generated',
+        interaction: interaction,
+        aiPowered: true
+      });
+    } else {
+      // Fallback to simple bot
+      const response = bot.processMessage(message, userName);
+      const interaction = bot.logCustomerInteraction(userName, message, response);
+
+      res.json({
+        input: message,
+        response: response,
+        interaction: interaction,
+        aiPowered: false
+      });
+    }
+  } catch (error) {
+    console.error('Test endpoint error:', error);
+
+    // Fallback to simple bot on error
+    const response = bot.processMessage(message, userName);
+    const interaction = bot.logCustomerInteraction(userName, message, response);
+
+    res.json({
+      input: message,
+      response: response,
+      interaction: interaction,
+      error: error.message,
+      aiPowered: false
+    });
+  }
 });
 
 // Get customer interactions for sales follow-up
