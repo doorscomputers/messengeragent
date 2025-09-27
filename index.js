@@ -320,23 +320,33 @@ app.get('/webhook/facebook', (req, res) => {
 // Facebook Messenger webhook for receiving messages (POST)
 app.post('/webhook/facebook', async (req, res) => {
   try {
+    console.log('📥 Received Facebook webhook:', JSON.stringify(req.body, null, 2));
+
     if (!facebookBot) {
+      console.error('❌ Facebook bot not configured');
       return res.status(500).json({ error: 'Facebook bot not configured' });
     }
 
     const body = req.body;
 
     if (body.object === 'page') {
+      console.log('✅ Processing page webhook events');
       // Process each messaging event
       for (const entry of body.entry) {
+        console.log('📨 Processing entry:', entry.id);
         for (const event of entry.messaging) {
+          console.log('💬 Processing messaging event:', JSON.stringify(event, null, 2));
+
           if (event.message) {
+            console.log('📝 Processing message from:', event.sender.id);
             // Regular message
             const interaction = await facebookBot.processEnhancedMessage(event);
             if (interaction) {
               customerInteractions.push(interaction);
+              console.log('✅ Interaction saved:', interaction.customer);
             }
           } else if (event.postback) {
+            console.log('🔘 Processing postback:', event.postback.payload);
             // Button/quick reply postback
             await facebookBot.processPostback(event);
           }
@@ -344,10 +354,11 @@ app.post('/webhook/facebook', async (req, res) => {
       }
       res.status(200).send('EVENT_RECEIVED');
     } else {
+      console.log('❌ Not a page webhook:', body.object);
       res.status(404).send('Not Found');
     }
   } catch (error) {
-    console.error('Facebook webhook error:', error);
+    console.error('❌ Facebook webhook error:', error);
     res.status(500).send('Internal Server Error');
   }
 });

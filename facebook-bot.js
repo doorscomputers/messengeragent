@@ -82,6 +82,11 @@ class FacebookMessengerBot {
   // Get sender information from Facebook
   async getSenderInfo(senderId) {
     try {
+      // For test users, return mock data
+      if (senderId.startsWith('test_user_')) {
+        return { first_name: 'TestUser' };
+      }
+
       const response = await axios.get(`https://graph.facebook.com/v18.0/${senderId}`, {
         params: {
           fields: 'first_name,last_name',
