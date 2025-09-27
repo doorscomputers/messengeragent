@@ -63,9 +63,17 @@ class AIEngine {
       return { type: 'call_request', confidence: 0.9, urgency: 'high' };
     }
 
+    // Immediate purchase intent - highest priority
+    if (this.containsAny(lowerMessage, [
+      'buy now', 'order now', 'purchase now', 'checkout', 'add to cart',
+      'bili na', 'kumuha na', 'order ko na', 'ready to buy'
+    ])) {
+      return { type: 'ready_to_purchase', confidence: 1.0, urgency: 'immediate' };
+    }
+
     // High-intent buying signals
     if (this.containsAny(lowerMessage, [
-      'buy', 'purchase', 'order', 'checkout', 'payment', 'pay',
+      'buy', 'purchase', 'order', 'payment', 'pay',
       'bili', 'kumuha', 'how to buy', 'paano bumili'
     ])) {
       return { type: 'buying', confidence: 0.9, urgency: 'high' };
@@ -108,6 +116,9 @@ class AIEngine {
     const shopName = this.businessData.shopName;
 
     switch (intent.type) {
+      case 'ready_to_purchase':
+        return this.generatePurchaseHandoffResponse(message, userName, context);
+
       case 'call_request':
         return this.generateCallResponse(message, userName, context);
 
@@ -129,6 +140,39 @@ class AIEngine {
       default:
         return this.generateHelpfulResponse(message, userName, context);
     }
+  }
+
+  generatePurchaseHandoffResponse(message, userName, context) {
+    const shopName = this.businessData.shopName;
+    const businessInfo = this.businessData.businessInfo;
+    const mentionedProduct = this.findMentionedProduct(message);
+
+    let productInfo = '';
+    if (mentionedProduct) {
+      productInfo = ` for the ${mentionedProduct.name} (₱${mentionedProduct.price})`;
+    }
+
+    const responses = [
+      `Perfect, ${userName}! I'm connecting you with our sales team to complete your order${productInfo}. 🛒`,
+      `Excellent choice, ${userName}! Let me connect you with our seller to finalize your purchase${productInfo}. ✨`,
+      `Great! I'm transferring you to our sales specialist to process your order${productInfo}. 🎯`
+    ];
+
+    return {
+      text: this.selectResponse(responses) + ` You can also:
+
+📞 **Call us directly**: ${businessInfo.businessHours || 'Mon-Sat 9AM-6PM'}
+💬 **Continue here**: I'll connect you with a live agent
+📱 **Visit our page**: Check our full catalog
+
+**Ready to proceed with your order?**`,
+      quickReplies: [
+        { title: '🛒 Complete Order', payload: 'COMPLETE_ORDER' },
+        { title: '👨‍💼 Talk to Agent', payload: 'HUMAN_AGENT' },
+        { title: '📞 Get Phone Number', payload: 'GET_PHONE' },
+        { title: '📱 View Page', payload: 'VIEW_PAGE' }
+      ]
+    };
   }
 
   generateCallResponse(message, userName, context) {

@@ -23,10 +23,20 @@ class BusinessConfig {
         shippingFee: '₱50-150',
         freeShippingMinimum: 1000,
         businessHours: 'Mon-Sat 9AM-6PM',
+        contactInfo: {
+          phone: '+63 917 123 4567',
+          email: 'sales@yourbusiness.com',
+          address: 'Metro Manila, Philippines'
+        },
         socialMedia: {
           facebook: '',
           instagram: '',
           website: ''
+        },
+        orderProcess: {
+          method: 'facebook_page', // facebook_page, website, phone, etc.
+          instructions: 'Message our main page or call during business hours',
+          paymentOptions: ['Cash on Delivery', 'GCash', 'Bank Transfer', 'Credit Card']
         }
       },
 

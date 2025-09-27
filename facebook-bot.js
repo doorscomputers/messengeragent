@@ -219,9 +219,66 @@ class FacebookMessengerBot {
     try {
       const senderId = event.sender.id;
       const payload = event.postback.payload;
+      const senderInfo = await this.getSenderInfo(senderId);
+      const userName = senderInfo.first_name || 'there';
 
       let response = '';
+      let quickReplies = [];
+
       switch (payload) {
+        case 'COMPLETE_ORDER':
+          response = `Perfect, ${userName}! To complete your order, please:
+
+🔗 **Visit our main page**: AIO Business
+📞 **Call us**: Mon-Sat 9AM-6PM
+💬 **Continue messaging**: I'll connect you with our sales team
+
+**We'll process your order immediately!**`;
+          quickReplies = [
+            { title: '📱 Visit Page', payload: 'VIEW_PAGE' },
+            { title: '📞 Get Phone', payload: 'GET_PHONE' },
+            { title: '💬 Talk to Agent', payload: 'HUMAN_AGENT' }
+          ];
+          break;
+
+        case 'HUMAN_AGENT':
+          response = `I'm connecting you with our sales team now, ${userName}! 👨‍💼
+
+**A live agent will assist you with:**
+• Order processing
+• Payment options
+• Delivery arrangements
+• Any special requests
+
+Please wait a moment while I transfer you...`;
+          break;
+
+        case 'GET_PHONE':
+          response = `📞 **Contact Information**
+
+**Phone**: +63 917 123 4567
+**Business Hours**: Mon-Sat 9AM-6PM
+**Location**: Metro Manila
+
+Feel free to call us directly for immediate assistance!`;
+          quickReplies = [
+            { title: '💬 Continue Chat', payload: 'CONTINUE_CHAT' },
+            { title: '🛒 Order Now', payload: 'COMPLETE_ORDER' }
+          ];
+          break;
+
+        case 'VIEW_PAGE':
+          response = `📱 **Visit Our Main Page**
+
+Search for "AIO Business" on Facebook to see our complete catalog and place orders directly.
+
+You can also continue chatting here for any questions!`;
+          quickReplies = [
+            { title: '💬 Continue Chat', payload: 'CONTINUE_CHAT' },
+            { title: '📞 Call Us', payload: 'GET_PHONE' }
+          ];
+          break;
+
         case 'PRICES':
           response = 'What product would you like to know the price for? 💰';
           break;
@@ -238,7 +295,11 @@ class FacebookMessengerBot {
           response = 'How can I help you today?';
       }
 
-      await this.sendMessage(senderId, response);
+      if (quickReplies.length > 0) {
+        await this.sendQuickReply(senderId, response, quickReplies);
+      } else {
+        await this.sendMessage(senderId, response);
+      }
 
     } catch (error) {
       console.error('Error processing postback:', error);
