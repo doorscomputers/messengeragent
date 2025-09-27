@@ -27,18 +27,21 @@ class FacebookMessengerBot {
   // Verify webhook (required by Facebook)
   verifyWebhook(mode, token, challenge) {
     console.log('verifyWebhook called with:');
-    console.log('  mode:', mode);
-    console.log('  token:', token);
-    console.log('  this.verifyToken:', this.verifyToken);
-    console.log('  challenge:', challenge);
+    console.log('  mode:', JSON.stringify(mode));
+    console.log('  token:', JSON.stringify(token));
+    console.log('  this.verifyToken:', JSON.stringify(this.verifyToken));
+    console.log('  challenge:', JSON.stringify(challenge));
     console.log('  mode check:', mode === 'subscribe');
     console.log('  token check:', token === this.verifyToken);
+    console.log('  token length comparison:', token?.length, 'vs', this.verifyToken?.length);
 
     if (mode === 'subscribe' && token === this.verifyToken) {
-      console.log('Facebook webhook verified successfully');
+      console.log('✅ Facebook webhook verified successfully');
       return challenge;
     }
-    console.log('Facebook webhook verification failed');
+    console.log('❌ Facebook webhook verification failed');
+    console.log('   Mode valid:', mode === 'subscribe');
+    console.log('   Token valid:', token === this.verifyToken);
     return null;
   }
 

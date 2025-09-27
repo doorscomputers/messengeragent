@@ -293,13 +293,24 @@ app.get('/webhook/facebook', (req, res) => {
   console.log('Challenge:', challenge);
   console.log('Facebook bot configured:', !!facebookBot);
 
+  // If no parameters, return a friendly message
+  if (!mode && !token && !challenge) {
+    return res.status(200).send('Webhook endpoint is ready. Use proper verification parameters.');
+  }
+
+  // Check if required parameters are missing
+  if (!mode || !token || !challenge) {
+    console.log('Missing required verification parameters');
+    return res.status(400).send('Missing required verification parameters: hub.mode, hub.verify_token, hub.challenge');
+  }
+
   if (facebookBot) {
     const result = facebookBot.verifyWebhook(mode, token, challenge);
     console.log('Verification result:', result);
     if (result) {
       res.status(200).send(challenge);
     } else {
-      res.status(403).send('Verification failed');
+      res.status(403).send('Verification failed - invalid token or mode');
     }
   } else {
     res.status(500).send('Facebook bot not configured');
