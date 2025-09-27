@@ -56,6 +56,13 @@ class AIEngine {
   analyzeIntent(message, context) {
     const lowerMessage = message.toLowerCase();
 
+    // Call request - handle immediately
+    if (this.containsAny(lowerMessage, [
+      'call me', 'can you call', 'phone me', 'tawag', 'call you', 'talk to you'
+    ])) {
+      return { type: 'call_request', confidence: 0.9, urgency: 'high' };
+    }
+
     // High-intent buying signals
     if (this.containsAny(lowerMessage, [
       'buy', 'purchase', 'order', 'checkout', 'payment', 'pay',
@@ -101,6 +108,9 @@ class AIEngine {
     const shopName = this.businessData.shopName;
 
     switch (intent.type) {
+      case 'call_request':
+        return this.generateCallResponse(message, userName, context);
+
       case 'buying':
         return this.generateBuyingResponse(message, userName, context);
 
@@ -121,20 +131,57 @@ class AIEngine {
     }
   }
 
-  generateBuyingResponse(message, userName, context) {
+  generateCallResponse(message, userName, context) {
+    const businessInfo = this.businessData.businessInfo;
+    const businessHours = businessInfo.businessHours || 'Mon-Sat 9AM-6PM';
+
+    // Natural responses for call requests
     const responses = [
-      `Excellent, ${userName}! I'm excited to help you with your purchase. 🛒`,
-      `Great choice, ${userName}! Let me guide you through our ordering process. ✨`,
-      `Perfect timing, ${userName}! I can help you place your order right now. 🎯`
+      `I appreciate that, ${userName}! I'm actually a virtual assistant, so I can't make phone calls. But I'm here to help you with everything you need! 😊`,
+      `Thanks for asking, ${userName}! I'm a digital assistant, so I can't call you directly. But I can connect you with our team or answer any questions right here! 💬`,
+      `I'd love to help, ${userName}! I'm an AI assistant, so I can't make calls, but I can provide all the information you need right here. What would you like to know? 🤖`
     ];
 
     return {
-      text: this.selectResponse(responses) + " What specific product interests you most?",
+      text: this.selectResponse(responses) + ` Our business hours are ${businessHours} if you'd like to call us directly.`,
       quickReplies: [
-        { title: '📱 View Products', payload: 'VIEW_PRODUCTS' },
-        { title: '💰 Check Prices', payload: 'PRICING' },
-        { title: '📞 Call Me', payload: 'REQUEST_CALL' },
-        { title: '📧 Send Details', payload: 'EMAIL_INFO' }
+        { title: '📞 Get Phone Number', payload: 'GET_PHONE' },
+        { title: '💬 Continue Chat', payload: 'CONTINUE_CHAT' },
+        { title: '📧 Email Us', payload: 'EMAIL_CONTACT' },
+        { title: '📱 View Products', payload: 'VIEW_PRODUCTS' }
+      ]
+    };
+  }
+
+  generateBuyingResponse(message, userName, context) {
+    // Check if this is a follow-up to avoid repetitive greetings
+    const visitCount = context.interactions.length;
+
+    let responseText;
+    if (visitCount === 0) {
+      const responses = [
+        `Excellent, ${userName}! I'm excited to help you with your purchase. 🛒`,
+        `Great choice, ${userName}! Let me guide you through our ordering process. ✨`,
+        `Perfect timing, ${userName}! I can help you place your order right now. 🎯`
+      ];
+      responseText = this.selectResponse(responses) + " What specific product interests you most?";
+    } else {
+      const followUpResponses = [
+        "Perfect! What specific product are you interested in?",
+        "Great! Which item would you like to order?",
+        "Excellent! What can I help you purchase today?",
+        "Sure thing! What product catches your eye?"
+      ];
+      responseText = this.selectResponse(followUpResponses);
+    }
+
+    return {
+      text: responseText,
+      quickReplies: [
+        { title: '📱 iPhones', payload: 'IPHONES' },
+        { title: '💻 Laptops', payload: 'LAPTOPS' },
+        { title: '🎧 Audio', payload: 'AUDIO' },
+        { title: '📞 Call Info', payload: 'REQUEST_CALL' }
       ]
     };
   }
@@ -201,15 +248,24 @@ class AIEngine {
     const shopName = this.businessData.shopName;
     const visitCount = context.interactions.length;
 
-    if (visitCount > 1) {
+    // Only greet on first interaction, then be more conversational
+    if (visitCount === 0) {
       return {
-        text: `Welcome back, ${userName}! Great to see you again at ${shopName}! 👋 Ready to find what you're looking for?`,
+        text: `Hello ${userName}! Welcome to ${shopName}! 👋 I'm here to help you find exactly what you need. What brings you here today?`,
         quickReplies: this.getMainMenuQuickReplies()
       };
     }
 
+    // For returning customers, be more natural
+    const casualResponses = [
+      `Sure thing! What can I help you with?`,
+      `Of course! What are you looking for today?`,
+      `Absolutely! How can I assist you?`,
+      `Great! What would you like to know?`
+    ];
+
     return {
-      text: `Hello ${userName}! Welcome to ${shopName}! 👋 I'm here to help you find exactly what you need. What brings you here today?`,
+      text: this.selectResponse(casualResponses),
       quickReplies: this.getMainMenuQuickReplies()
     };
   }
