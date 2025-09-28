@@ -168,7 +168,7 @@ class ConversionTracker {
         }
 
         // Update tags
-        if (customerTags) {
+        if (customerTags && Array.isArray(customerTags)) {
             customerTags.forEach(tag => journey.tags.add(tag.tag));
         }
 

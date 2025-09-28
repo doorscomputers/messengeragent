@@ -718,6 +718,11 @@ ${businessConfig.businessInfo?.freeShippingMinimum && product.price >= businessC
 
     // Determine urgency level
     determineUrgency(analysis, leadScore) {
+        // Safety check for analysis object
+        if (!analysis || !analysis.urgencyIndicators) {
+            return leadScore >= 25 ? 'high' : leadScore >= 15 ? 'medium' : 'low';
+        }
+
         if (leadScore >= 25 || analysis.urgencyIndicators.length >= 2) {
             return 'high';
         } else if (leadScore >= 15 || analysis.urgencyIndicators.length >= 1) {
@@ -786,7 +791,9 @@ ${businessConfig.businessInfo?.freeShippingMinimum && product.price >= businessC
             await this.db.logInteraction(interaction);
 
             // Log to spreadsheet if available
-            await this.logToSpreadsheet(data);
+            if (typeof this.logToSpreadsheet === 'function') {
+                await this.logToSpreadsheet(data);
+            }
 
             // Learn from successful patterns
             if (data.analysis.confidence > 0.7) {
