@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Business Import - AI-Powered Setup</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .import-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .import-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .import-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.15);
+        }
+
+        .import-card.active {
+            border: 2px solid #667eea;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e5e7eb 100%);
+        }
+
+        .import-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .import-card i {
+            font-size: 2rem;
+            color: #667eea;
+        }
+
+        .import-card p {
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        .supported-formats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .format-tag {
+            background: #e5e7eb;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #374151;
+        }
+
+        .import-area {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .import-area.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .text-import textarea {
+            width: 100%;
+            min-height: 400px;
+            padding: 20px;
+            border: 2px dashed #d1d5db;
+            border-radius: 10px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .file-upload {
+            border: 2px dashed #d1d5db;
+            border-radius: 10px;
+            padding: 60px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: #667eea;
+            background: #f9fafb;
+        }
+
+        .file-upload.dragover {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e5e7eb 100%);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #9ca3af;
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .upload-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .process-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .process-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -3px rgb(0 0 0 / 0.3);
+        }
+
+        .process-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .processing {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .processing.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .success-icon {
+            text-align: center;
+            font-size: 4rem;
+            color: #10b981;
+            margin-bottom: 20px;
+        }
+
+        .extracted-data {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #10b981;
+        }
+
+        .data-section {
+            margin: 20px 0;
+        }
+
+        .data-section h4 {
+            color: #374151;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .continue-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .continue-btn:hover {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .import-methods {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-brain"></i> Smart Business Import</h1>
+            <p>Upload your business documents and let AI automatically extract and organize your information!</p>
+            <p><strong>Supports:</strong> Text, PDF, Excel, CSV, Images, Word Documents, Brochures</p>
+        </div>
+
+        <div class="import-methods">
+            <div class="import-card" onclick="selectImportMethod('text')">
+                <h3><i class="fas fa-paste"></i> Paste Text</h3>
+                <p>Copy and paste your product lists, FAQs, or business information directly</p>
+                <div class="supported-formats">
+                    <span class="format-tag">Plain Text</span>
+                    <span class="format-tag">Product Lists</span>
+                    <span class="format-tag">FAQs</span>
+                </div>
+            </div>
+
+            <div class="import-card" onclick="selectImportMethod('file')">
+                <h3><i class="fas fa-file-upload"></i> Upload Files</h3>
+                <p>Upload Excel, CSV, PDF, Word documents, or images with your business data</p>
+                <div class="supported-formats">
+                    <span class="format-tag">Excel</span>
+                    <span class="format-tag">CSV</span>
+                    <span class="format-tag">PDF</span>
+                    <span class="format-tag">Word</span>
+                    <span class="format-tag">Images</span>
+                </div>
+            </div>
+
+            <div class="import-card" onclick="selectImportMethod('website')">
+                <h3><i class="fas fa-globe"></i> From Website</h3>
+                <p>Extract information from your existing website or online store</p>
+                <div class="supported-formats">
+                    <span class="format-tag">Website URL</span>
+                    <span class="format-tag">Online Store</span>
+                    <span class="format-tag">Social Media</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Text Import Area -->
+        <div class="import-area text-import" id="text-import">
+            <h3><i class="fas fa-paste"></i> Paste Your Business Information</h3>
+            <p>Paste your product catalogs, FAQs, business details, or any text containing your business information:</p>
+            <textarea id="business-text" placeholder="Paste your business information here...
+
+Examples:
+- Product lists with names, prices, descriptions
+- Customer FAQs and answers
+- Business details (payment methods, shipping, contact info)
+- Target customer information
+- Sales strategies
+
+The AI will automatically organize this into a structured format!"></textarea>
+            <button class="process-btn" onclick="processText()">
+                <i class="fas fa-brain"></i> Process with AI
+            </button>
+        </div>
+
+        <!-- File Upload Area -->
+        <div class="import-area" id="file-import">
+            <h3><i class="fas fa-file-upload"></i> Upload Your Business Documents</h3>
+            <div class="file-upload" ondrop="dropHandler(event)" ondragover="dragOverHandler(event)" ondragleave="dragLeaveHandler(event)">
+                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                <h4>Drag and drop files here</h4>
+                <p>or</p>
+                <button class="upload-btn" onclick="document.getElementById('file-input').click()">
+                    <i class="fas fa-plus"></i> Choose Files
+                </button>
+                <input type="file" id="file-input" class="file-input" multiple accept=".xlsx,.xls,.csv,.pdf,.doc,.docx,.txt,.png,.jpg,.jpeg" onchange="handleFiles(this.files)">
+                <p style="margin-top: 20px; color: #6b7280; font-size: 0.9rem;">
+                    Supported: Excel (.xlsx), CSV (.csv), PDF (.pdf), Word (.doc/.docx), Images (.png/.jpg), Text (.txt)
+                </p>
+            </div>
+            <div id="file-list"></div>
+            <button class="process-btn" onclick="processFiles()" id="process-files-btn" disabled>
+                <i class="fas fa-brain"></i> Process Files with AI
+            </button>
+        </div>
+
+        <!-- Website Import Area -->
+        <div class="import-area" id="website-import">
+            <h3><i class="fas fa-globe"></i> Import from Website</h3>
+            <p>Enter your website URL or social media page to extract business information:</p>
+            <input type="url" id="website-url" placeholder="https://your-website.com" style="width: 100%; padding: 15px; border: 2px solid #d1d5db; border-radius: 10px; margin: 20px 0;">
+            <button class="process-btn" onclick="processWebsite()">
+                <i class="fas fa-brain"></i> Extract from Website
+            </button>
+        </div>
+
+        <!-- Processing Animation -->
+        <div class="processing" id="processing">
+            <div class="spinner"></div>
+            <h3>AI is Processing Your Data...</h3>
+            <p>Extracting products, FAQs, business details, and organizing everything for you!</p>
+        </div>
+
+        <!-- Results -->
+        <div class="results" id="results">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Successfully Extracted Business Data!</h2>
+            <div class="extracted-data" id="extracted-preview">
+                <!-- AI extracted data will be shown here -->
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="continue-btn" onclick="continueToSetup()">
+                    <i class="fas fa-arrow-right"></i> Continue to Setup Wizard
+                </button>
+                <button class="continue-btn" onclick="startOver()" style="background: #6b7280; margin-left: 15px;">
+                    <i class="fas fa-redo"></i> Import More Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMethod = null;
+        let extractedData = null;
+        let uploadedFiles = [];
+
+        function selectImportMethod(method) {
+            // Remove active class from all cards
+            document.querySelectorAll('.import-card').forEach(card => {
+                card.classList.remove('active');
+            });
+
+            // Hide all import areas
+            document.querySelectorAll('.import-area').forEach(area => {
+                area.classList.remove('active');
+            });
+
+            // Activate selected method
+            event.target.closest('.import-card').classList.add('active');
+            document.getElementById(method + '-import').classList.add('active');
+            currentMethod = method;
+        }
+
+        function dragOverHandler(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.add('dragover');
+        }
+
+        function dragLeaveHandler(ev) {
+            ev.currentTarget.classList.remove('dragover');
+        }
+
+        function dropHandler(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('dragover');
+            handleFiles(ev.dataTransfer.files);
+        }
+
+        function handleFiles(files) {
+            uploadedFiles = Array.from(files);
+            displayFileList();
+            document.getElementById('process-files-btn').disabled = uploadedFiles.length === 0;
+        }
+
+        function displayFileList() {
+            const fileList = document.getElementById('file-list');
+            if (uploadedFiles.length === 0) {
+                fileList.innerHTML = '';
+                return;
+            }
+
+            const html = `
+                <div style="margin-top: 20px; padding: 20px; background: #f9fafb; border-radius: 10px;">
+                    <h4><i class="fas fa-files"></i> Selected Files (${uploadedFiles.length})</h4>
+                    ${uploadedFiles.map(file => `
+                        <div style="display: flex; align-items: center; margin: 10px 0; padding: 10px; background: white; border-radius: 5px;">
+                            <i class="fas fa-file" style="margin-right: 10px; color: #667eea;"></i>
+                            <span>${file.name}</span>
+                            <span style="margin-left: auto; color: #6b7280; font-size: 0.9rem;">${(file.size / 1024).toFixed(1)} KB</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            fileList.innerHTML = html;
+        }
+
+        async function processText() {
+            const text = document.getElementById('business-text').value;
+            if (!text.trim()) {
+                alert('Please paste your business information first!');
+                return;
+            }
+
+            showProcessing();
+
+            try {
+                const response = await fetch('/api/smart-import/text', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: text })
+                });
+
+                const result = await response.json();
+                showResults(result);
+            } catch (error) {
+                alert('Processing failed: ' + error.message);
+                hideProcessing();
+            }
+        }
+
+        async function processFiles() {
+            if (uploadedFiles.length === 0) {
+                alert('Please select files first!');
+                return;
+            }
+
+            showProcessing();
+
+            try {
+                const formData = new FormData();
+                uploadedFiles.forEach(file => {
+                    formData.append('files', file);
+                });
+
+                const response = await fetch('/api/smart-import/files', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                showResults(result);
+            } catch (error) {
+                alert('Processing failed: ' + error.message);
+                hideProcessing();
+            }
+        }
+
+        async function processWebsite() {
+            const url = document.getElementById('website-url').value;
+            if (!url.trim()) {
+                alert('Please enter a website URL first!');
+                return;
+            }
+
+            showProcessing();
+
+            try {
+                const response = await fetch('/api/smart-import/website', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
+                });
+
+                const result = await response.json();
+                showResults(result);
+            } catch (error) {
+                alert('Processing failed: ' + error.message);
+                hideProcessing();
+            }
+        }
+
+        function showProcessing() {
+            document.querySelectorAll('.import-area').forEach(area => {
+                area.style.display = 'none';
+            });
+            document.getElementById('processing').classList.add('active');
+        }
+
+        function hideProcessing() {
+            document.getElementById('processing').classList.remove('active');
+            if (currentMethod) {
+                document.getElementById(currentMethod + '-import').style.display = 'block';
+            }
+        }
+
+        function showResults(data) {
+            extractedData = data;
+            hideProcessing();
+
+            // Display extracted data preview
+            const preview = document.getElementById('extracted-preview');
+            preview.innerHTML = `
+                <div class="data-section">
+                    <h4><i class="fas fa-store"></i> Business Info</h4>
+                    <p><strong>Name:</strong> ${data.business_info?.name || 'Not extracted'}</p>
+                    <p><strong>Type:</strong> ${data.business_info?.type || 'Not specified'}</p>
+                </div>
+
+                <div class="data-section">
+                    <h4><i class="fas fa-box"></i> Products Found</h4>
+                    <p><strong>${data.products?.length || 0}</strong> products extracted</p>
+                    ${data.products?.slice(0, 3).map(p => `<p>• ${p.name} - ₱${p.price}</p>`).join('') || '<p>No products found</p>'}
+                    ${data.products?.length > 3 ? `<p><em>...and ${data.products.length - 3} more</em></p>` : ''}
+                </div>
+
+                <div class="data-section">
+                    <h4><i class="fas fa-question-circle"></i> FAQs Found</h4>
+                    <p><strong>${data.faqs?.length || 0}</strong> FAQ entries extracted</p>
+                    ${data.faqs?.slice(0, 2).map(f => `<p>• ${f.question}</p>`).join('') || '<p>No FAQs found</p>'}
+                </div>
+            `;
+
+            document.getElementById('results').classList.add('active');
+        }
+
+        function continueToSetup() {
+            if (extractedData) {
+                // Store data in localStorage and redirect to setup wizard
+                localStorage.setItem('smartImportData', JSON.stringify(extractedData));
+                window.location.href = '/setup?import=smart';
+            }
+        }
+
+        function startOver() {
+            document.getElementById('results').classList.remove('active');
+            document.getElementById('business-text').value = '';
+            uploadedFiles = [];
+            displayFileList();
+            extractedData = null;
+
+            if (currentMethod) {
+                document.getElementById(currentMethod + '-import').style.display = 'block';
+            }
+        }
+
+        // Auto-fill with sample data for testing
+        document.addEventListener('DOMContentLoaded', function() {
+            const sampleData = \`${JSON.stringify([
+                "Product Name: Lemon Essential Oil (10ml)",
+                "Price (₱): 320",
+                "Category: Essential Oils",
+                "Stock Quantity: 65",
+                "Product Description: Sparkling, zesty oil cold-pressed from Citrus limon peel. Instantly brightens mood and cuts through cooking smells.",
+                "",
+                "Q&A 1",
+                "Customer Question: Are your essential oils 100% pure?",
+                "Your Answer: Yes. Our oils are 100% pure and undiluted—no carriers, fillers, or synthetic fragrance."
+            ].join('\\n')).slice(1, -1)}\`;
+
+            // Uncomment to auto-fill for testing
+            // document.getElementById('business-text').value = sampleData;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Bot Service - Client Onboarding</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .step-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .step-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .step-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .code-block {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border: 1px solid #3b82f6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .success-box {
+            background: #f0fdf4;
+            border: 1px solid #16a34a;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .checklist li::before {
+            content: "✅";
+            margin-right: 10px;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .pricing-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+        }
+
+        .pricing-card.featured {
+            border-color: #16a34a;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+        }
+
+        .price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin: 15px 0;
+        }
+
+        @media (max-width: 768px) {
+            .step-container {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Bot Service - Client Onboarding</h1>
+            <p><strong>Complete Guide for Setting Up Client Bots</strong></p>
+            <p>From Business Data → Live Facebook Bot in 30 minutes</p>
+        </div>
+
+        <!-- Phase 1: Client Data Collection -->
+        <div class="step-container">
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Collect Client Data</div>
+                </div>
+
+                <p>When a seller subscribes, collect their business information:</p>
+
+                <div class="info-box">
+                    <h4>📋 Client Information Form</h4>
+                    <ul class="checklist">
+                        <li>Business name and type</li>
+                        <li>Complete product catalog</li>
+                        <li>Common customer FAQs</li>
+                        <li>Payment methods and policies</li>
+                        <li>Contact information</li>
+                    </ul>
+                </div>
+
+                <p><strong>Use Smart Import:</strong> Client can paste all their product lists and FAQs in any format!</p>
+
+                <div class="code-block">
+# Process client data with AI:
+node test-smart-import.js
+
+# AI extracts:
+✅ Products with prices
+✅ FAQs with answers
+✅ Business details
+✅ Ready for setup!
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Facebook Setup</div>
+                </div>
+
+                <p>Guide client through Facebook Developer setup:</p>
+
+                <div class="warning-box">
+                    <h4>⚠️ Client Must Complete This</h4>
+                    <ol>
+                        <li>Go to <strong>developers.facebook.com</strong></li>
+                        <li>Create App → Business</li>
+                        <li>Add "Messenger" product</li>
+                        <li>Generate Page Access Token</li>
+                        <li>Create custom Verify Token</li>
+                    </ol>
+                </div>
+
+                <p><strong>Required from Client:</strong></p>
+                <div class="code-block">
+Page Access Token: EAAxxxxxxx
+Verify Token: MyBusiness2024
+Facebook Page ID: 1234567890
+Business Page URL: facebook.com/mybusiness
+                </div>
+
+                <p>Client provides these credentials to you securely.</p>
+            </div>
+        </div>
+
+        <!-- Phase 2: Bot Deployment -->
+        <div class="step-container">
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Deploy Client Bot</div>
+                </div>
+
+                <p>Deploy a dedicated bot instance for the client:</p>
+
+                <div class="info-box">
+                    <h4>🚀 Deployment Options</h4>
+                    <p><strong>Option A: Cloud Platform (Recommended)</strong></p>
+                    <ul>
+                        <li>Heroku, Railway, or Vercel</li>
+                        <li>Automatic scaling</li>
+                        <li>Easy management</li>
+                    </ul>
+
+                    <p><strong>Option B: VPS/Server</strong></p>
+                    <ul>
+                        <li>More control</li>
+                        <li>Lower monthly costs</li>
+                        <li>Multiple clients per server</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+# Environment variables for client:
+OPENAI_API_KEY=your_openai_key
+FACEBOOK_PAGE_ACCESS_TOKEN=client_token
+FACEBOOK_VERIFY_TOKEN=client_verify_token
+SHOP_NAME=client_business_name
+PORT=3000
+                </div>
+
+                <p>Each client gets their own bot instance with their branding.</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <div class="step-title">Configure Business Data</div>
+                </div>
+
+                <p>Upload extracted business data to client's bot:</p>
+
+                <div class="code-block">
+# Configure client's business:
+curl -X POST https://client-bot.com/config/business \
+  -H "Content-Type: application/json" \
+  -d '{
+    "shopName": "Essential Oils PH",
+    "products": [smart_import_products],
+    "faqs": [smart_import_faqs],
+    "businessInfo": {
+      "paymentMethods": ["COD", "GCash"],
+      "shippingFee": "₱50",
+      "businessHours": "9AM-6PM"
+    }
+  }'
+                </div>
+
+                <div class="success-box">
+                    <h4>✅ What This Sets Up</h4>
+                    <ul class="checklist">
+                        <li>AI knows all client's products</li>
+                        <li>Responds with correct prices</li>
+                        <li>Answers business-specific FAQs</li>
+                        <li>Uses client's payment methods</li>
+                        <li>Matches client's business hours</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 3: Testing & Go-Live -->
+        <div class="step-container">
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number">5</div>
+                    <div class="step-title">Test & Verify</div>
+                </div>
+
+                <p>Test the bot before client goes live:</p>
+
+                <div class="code-block">
+# Test client's bot:
+curl -X POST https://client-bot.com/test/message \
+  -d '{"message": "Magkano po yung lavender oil?"}'
+
+# Expected response:
+{
+  "response": "Our Lavender Essential Oil is ₱250...",
+  "leadScore": 25,
+  "intent": "price_inquiry",
+  "aiPowered": true
+}
+                </div>
+
+                <div class="warning-box">
+                    <h4>🧪 Testing Checklist</h4>
+                    <ul class="checklist">
+                        <li>Filipino price inquiries work</li>
+                        <li>Product information accurate</li>
+                        <li>FAQ responses complete</li>
+                        <li>Lead scoring functional</li>
+                        <li>Dashboard shows analytics</li>
+                    </ul>
+                </div>
+
+                <p>Have client test by messaging their own Facebook page.</p>
+            </div>
+
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number">6</div>
+                    <div class="step-title">Go Live & Monitor</div>
+                </div>
+
+                <p>Set up Facebook webhook and monitor performance:</p>
+
+                <div class="info-box">
+                    <h4>📱 Facebook Webhook Setup</h4>
+                    <ol>
+                        <li>Facebook Developer Console</li>
+                        <li>Set Webhook URL: <code>https://client-bot.com/webhook/facebook</code></li>
+                        <li>Set Verify Token: (client's token)</li>
+                        <li>Subscribe to messages</li>
+                        <li>Test webhook</li>
+                    </ol>
+                </div>
+
+                <div class="success-box">
+                    <h4>🎉 Client Bot is Live!</h4>
+                    <p>Provide client with:</p>
+                    <ul>
+                        <li><strong>Dashboard:</strong> https://client-bot.com/dashboard</li>
+                        <li><strong>Analytics:</strong> Lead tracking and metrics</li>
+                        <li><strong>Support:</strong> Your contact for issues</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Options -->
+        <div class="step-card">
+            <h2 style="text-align: center; margin-bottom: 30px;">💰 Pricing Models for Your Service</h2>
+
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>Basic Plan</h3>
+                    <div class="price">₱2,500/mo</div>
+                    <ul>
+                        <li>1,000 messages/month</li>
+                        <li>Basic analytics</li>
+                        <li>Email support</li>
+                        <li>Standard response time</li>
+                    </ul>
+                </div>
+
+                <div class="pricing-card featured">
+                    <h3>Pro Plan</h3>
+                    <div class="price">₱5,500/mo</div>
+                    <ul>
+                        <li>5,000 messages/month</li>
+                        <li>Advanced analytics</li>
+                        <li>Priority support</li>
+                        <li>Custom responses</li>
+                        <li>Lead export</li>
+                    </ul>
+                </div>
+
+                <div class="pricing-card">
+                    <h3>Enterprise</h3>
+                    <div class="price">₱12,000/mo</div>
+                    <ul>
+                        <li>Unlimited messages</li>
+                        <li>Real-time analytics</li>
+                        <li>24/7 support</li>
+                        <li>White-label dashboard</li>
+                        <li>Custom integrations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="step-card">
+            <h2>🎯 Summary: You're Ready to Scale!</h2>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 30px 0;">
+                <div>
+                    <h3>✅ What You Provide:</h3>
+                    <ul class="checklist">
+                        <li>Smart Import data processing</li>
+                        <li>AI bot deployment</li>
+                        <li>Facebook integration setup</li>
+                        <li>Dashboard and analytics</li>
+                        <li>Ongoing support</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3>✅ What Client Gets:</h3>
+                    <ul class="checklist">
+                        <li>24/7 AI customer service</li>
+                        <li>Intelligent lead qualification</li>
+                        <li>Filipino/English support</li>
+                        <li>Real-time analytics</li>
+                        <li>Increased sales conversion</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="success-box">
+                <h4>🚀 Ready to Launch Your AI Bot Service!</h4>
+                <p>Your system handles multiple clients, processes any business type, and scales automatically. Start marketing to Filipino businesses and grow your AI bot service!</p>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn" onclick="window.print()">📄 Print This Guide</button>
+                <button class="btn" onclick="window.open('SELLER_WORKFLOW.md')">📋 Download Workflow</button>
+                <button class="btn" onclick="alert('Your AI bot service is ready to scale! 🚀')">🎉 Celebrate Success!</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

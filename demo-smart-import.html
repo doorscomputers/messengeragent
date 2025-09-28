@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Import Demo - AI Business Setup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #1f2937;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .demo-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            margin-bottom: 30px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .feature-card h3 {
+            color: #1f2937;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-card i {
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+
+        .demo-section {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            margin-bottom: 30px;
+        }
+
+        .input-area {
+            background: #f9fafb;
+            border: 2px dashed #d1d5db;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .sample-text {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 20px 0;
+            white-space: pre-line;
+        }
+
+        .results {
+            background: #f0fdf4;
+            border: 2px solid #16a34a;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .results h3 {
+            color: #16a34a;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #16a34a;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin: 10px 10px 10px 0;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .success-btn {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border: 1px solid #3b82f6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-box h4 {
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-brain"></i> Smart Import Demo</h1>
+            <p><strong>AI-Powered Business Setup</strong></p>
+            <p>See how AI automatically extracts and organizes your business information!</p>
+        </div>
+
+        <div class="demo-card">
+            <h2><i class="fas fa-magic"></i> What Smart Import Does</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3><i class="fas fa-paste"></i> Paste Any Format</h3>
+                    <p>Copy and paste your product lists, FAQs, business details in any format - even messy text!</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-brain"></i> AI Processing</h3>
+                    <p>GPT-4o-mini intelligently extracts products, prices, descriptions, and FAQs automatically.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-organize"></i> Auto-Organize</h3>
+                    <p>Creates structured data ready for your business setup wizard - no manual entry needed!</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-language"></i> Multilingual</h3>
+                    <p>Handles both English and Filipino content naturally, perfect for Philippine businesses.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2><i class="fas fa-play"></i> Live Demo</h2>
+            <p>Here's what happened when we processed your essential oils business data:</p>
+
+            <div class="input-area">
+                <h3><i class="fas fa-file-text"></i> Sample Input (What You Paste)</h3>
+                <div class="sample-text">Product Name: Lemon Essential Oil (10ml)
+Price (₱): 320
+Category: Essential Oils
+Stock Quantity: 65
+Product Description: Sparkling, zesty oil cold-pressed from Citrus limon peel. Instantly brightens mood and cuts through cooking smells.
+
+Product Name: Frankincense Serrata Essential Oil (10ml)
+Price (₱): 720
+Category: Essential Oils
+Stock Quantity: 40
+Product Description: Resinous, woody-citrus oil steam-distilled from Boswellia serrata. Grounding aroma for meditation.
+
+Q&A 1
+Customer Question: Are your essential oils 100% pure?
+Your Answer: Yes. Our oils are 100% pure and undiluted—no carriers, fillers, or synthetic fragrance.
+
+Q&A 2
+Customer Question: Where do you source your oils?
+Your Answer: We partner with vetted farms and distillers in regions where each plant thrives.</div>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <i class="fas fa-arrow-down" style="font-size: 2rem; color: #667eea;"></i>
+                <br><strong>AI Processing...</strong>
+            </div>
+
+            <div class="results">
+                <h3><i class="fas fa-check-circle"></i> AI Extraction Results</h3>
+
+                <div class="result-item">
+                    <h4><i class="fas fa-store"></i> Business Info Detected</h4>
+                    <p><strong>Name:</strong> Essential Oils Co.</p>
+                    <p><strong>Type:</strong> Retail</p>
+                    <p><strong>Category:</strong> Essential Oils</p>
+                </div>
+
+                <div class="result-item">
+                    <h4><i class="fas fa-box"></i> Products Extracted (2 items)</h4>
+                    <p><strong>1.</strong> Lemon Essential Oil (10ml) - ₱320</p>
+                    <p><strong>2.</strong> Frankincense Serrata Essential Oil (10ml) - ₱720</p>
+                    <p><em>✅ Prices, categories, stock, and descriptions automatically extracted!</em></p>
+                </div>
+
+                <div class="result-item">
+                    <h4><i class="fas fa-question-circle"></i> FAQs Extracted (2 items)</h4>
+                    <p><strong>1.</strong> Are your essential oils 100% pure?</p>
+                    <p><strong>2.</strong> Where do you source your oils?</p>
+                    <p><em>✅ Questions and detailed answers automatically organized!</em></p>
+                </div>
+
+                <div class="result-item">
+                    <h4><i class="fas fa-credit-card"></i> Business Details Inferred</h4>
+                    <p><strong>Payment Methods:</strong> COD, GCash, Bank Transfer</p>
+                    <p><strong>Shipping:</strong> ₱50</p>
+                    <p><em>✅ AI intelligently adds common Filipino business practices!</em></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2><i class="fas fa-rocket"></i> What Happens Next</h2>
+
+            <div class="info-box">
+                <h4><i class="fas fa-magic"></i> Automatic Setup Wizard Population</h4>
+                <p>All extracted data automatically fills your 6-step business setup wizard:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>✅ <strong>Step 1:</strong> Business info pre-filled</li>
+                    <li>✅ <strong>Step 2:</strong> Products with prices and descriptions ready</li>
+                    <li>✅ <strong>Step 3:</strong> FAQs organized and categorized</li>
+                    <li>✅ <strong>Step 4-6:</strong> Smart defaults for target customers and sales strategy</li>
+                </ul>
+            </div>
+
+            <div style="text-align: center; margin: 40px 0;">
+                <button class="btn success-btn" onclick="showComparisonDemo()">
+                    <i class="fas fa-chart-bar"></i> See Before vs After Comparison
+                </button>
+                <button class="btn" onclick="showFileFormats()">
+                    <i class="fas fa-file"></i> See Supported Formats
+                </button>
+            </div>
+        </div>
+
+        <div class="demo-section" id="comparison-demo" style="display: none;">
+            <h2><i class="fas fa-balance-scale"></i> Before vs After</h2>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 30px 0;">
+                <div style="background: #fef2f2; padding: 20px; border-radius: 10px; border-left: 4px solid #ef4444;">
+                    <h3 style="color: #dc2626; margin-bottom: 15px;">❌ Traditional Setup</h3>
+                    <ul style="margin-left: 20px;">
+                        <li>Manual entry of each product</li>
+                        <li>Copy-paste each description</li>
+                        <li>Type each FAQ individually</li>
+                        <li>Format prices and details</li>
+                        <li>Organize categories manually</li>
+                        <li><strong>Time: 2-4 hours</strong></li>
+                    </ul>
+                </div>
+
+                <div style="background: #f0fdf4; padding: 20px; border-radius: 10px; border-left: 4px solid #16a34a;">
+                    <h3 style="color: #16a34a; margin-bottom: 15px;">✅ Smart Import</h3>
+                    <ul style="margin-left: 20px;">
+                        <li>Paste all data at once</li>
+                        <li>AI extracts everything</li>
+                        <li>Auto-organizes structure</li>
+                        <li>Handles any text format</li>
+                        <li>Ready for testing immediately</li>
+                        <li><strong>Time: 2-5 minutes</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section" id="file-formats" style="display: none;">
+            <h2><i class="fas fa-file"></i> Supported Import Formats</h2>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3><i class="fas fa-paste"></i> Text & Documents</h3>
+                    <p>Plain text, Word documents, PDF brochures, product catalogs, FAQ lists</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-table"></i> Spreadsheets</h3>
+                    <p>Excel (.xlsx), CSV files, Google Sheets exports, product databases</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-image"></i> Images</h3>
+                    <p>Product photos with text, scanned catalogs, handwritten lists (OCR)</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3><i class="fas fa-globe"></i> Websites</h3>
+                    <p>Existing websites, online stores, social media business pages</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2><i class="fas fa-play-circle"></i> Ready to Try It?</h2>
+            <p style="margin-bottom: 30px;">Your Smart Import system is ready! Here's how to use it:</p>
+
+            <div style="text-align: center;">
+                <button class="btn" onclick="window.open('/import', '_blank')">
+                    <i class="fas fa-upload"></i> Open Smart Import Interface
+                </button>
+                <button class="btn" onclick="window.open('/test.html', '_blank')">
+                    <i class="fas fa-test-tube"></i> Test AI Bot
+                </button>
+                <button class="btn" onclick="window.open('/setup', '_blank')">
+                    <i class="fas fa-cog"></i> Setup Wizard
+                </button>
+            </div>
+
+            <div class="info-box" style="margin-top: 30px;">
+                <h4><i class="fas fa-lightbulb"></i> Pro Tip</h4>
+                <p>For best results, include as much detail as possible in your paste. The AI works better with more context - product names, prices, descriptions, FAQs, business policies, etc.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showComparisonDemo() {
+            const demo = document.getElementById('comparison-demo');
+            demo.style.display = demo.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function showFileFormats() {
+            const formats = document.getElementById('file-formats');
+            formats.style.display = formats.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Auto-scroll to results
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.querySelector('.results').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

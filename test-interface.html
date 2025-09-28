@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FB Messenger Agent - Test Interface</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        .content {
+            padding: 30px;
+        }
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .test-section h2 {
+            color: #333;
+            margin-top: 0;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .message-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        .message-input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .btn:hover {
+            background: #5a6fd8;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+        .result pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .quick-tests {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .quick-test {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .quick-test:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .quick-test .language {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 0.9rem;
+        }
+        .quick-test .message {
+            margin: 8px 0;
+            font-style: italic;
+        }
+        .quick-test .expected {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        .score-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .score-high { background: #d4edda; color: #155724; }
+        .score-medium { background: #fff3cd; color: #856404; }
+        .score-low { background: #f8d7da; color: #721c24; }
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .analytics-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e1e5e9;
+            text-align: center;
+        }
+        .analytics-card h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .analytics-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 FB Messenger Agent Test Interface</h1>
+            <p>Test the enhanced AI system with English and Filipino messages</p>
+        </div>
+
+        <div class="content">
+            <!-- Manual Test Section -->
+            <div class="test-section">
+                <h2>📝 Manual Message Testing</h2>
+                <p>Type any message in English or Filipino to test the AI system:</p>
+                <input type="text" class="message-input" id="manualMessage"
+                       placeholder="e.g., 'Magkano po ang essential oil?' or 'How much is the lavender oil?'">
+                <button class="btn" onclick="testManualMessage()">Test Message</button>
+                <button class="btn btn-secondary" onclick="clearResults()">Clear Results</button>
+                <div id="manualResult"></div>
+            </div>
+
+            <!-- Quick Tests Section -->
+            <div class="test-section">
+                <h2>⚡ Quick Test Messages</h2>
+                <p>Click any message below to test it instantly:</p>
+                <div class="quick-tests">
+                    <div class="quick-test" onclick="testQuickMessage('Hi! I am interested in your essential oils. How much do they cost?')">
+                        <div class="language">🇺🇸 English</div>
+                        <div class="message">"Hi! I am interested in your essential oils. How much do they cost?"</div>
+                        <div class="expected">Expected: High lead score, product inquiry</div>
+                    </div>
+
+                    <div class="quick-test" onclick="testQuickMessage('Magkano po ang essential oil set ninyo?')">
+                        <div class="language">🇵🇭 Filipino</div>
+                        <div class="message">"Magkano po ang essential oil set ninyo?"</div>
+                        <div class="expected">Expected: Price inquiry, medium score</div>
+                    </div>
+
+                    <div class="quick-test" onclick="testQuickMessage('I want to buy 3 bottles of lavender oil now!')">
+                        <div class="language">🇺🇸 English</div>
+                        <div class="message">"I want to buy 3 bottles of lavender oil now!"</div>
+                        <div class="expected">Expected: Very high score, purchase intent</div>
+                    </div>
+
+                    <div class="quick-test" onclick="testQuickMessage('Gusto ko po bumili ng dalawang bote ng lavender oil. Magkano po lahat?')">
+                        <div class="language">🇵🇭 Filipino</div>
+                        <div class="message">"Gusto ko po bumili ng dalawang bote ng lavender oil. Magkano po lahat?"</div>
+                        <div class="expected">Expected: High score, purchase intent with quantity</div>
+                    </div>
+
+                    <div class="quick-test" onclick="testQuickMessage('May discount po ba kayo ngayon? Saan ko pwedeng makuha?')">
+                        <div class="language">🇵🇭 Filipino</div>
+                        <div class="message">"May discount po ba kayo ngayon? Saan ko pwedeng makuha?"</div>
+                        <div class="expected">Expected: Price conscious, delivery inquiry</div>
+                    </div>
+
+                    <div class="quick-test" onclick="testQuickMessage('URGENT! Need essential oils today! Cash ready!')">
+                        <div class="language">🇺🇸 English</div>
+                        <div class="message">"URGENT! Need essential oils today! Cash ready!"</div>
+                        <div class="expected">Expected: Ultra high score, urgency signals</div>
+                    </div>
+                </div>
+                <div id="quickResult"></div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div class="test-section">
+                <h2>📊 Real-time Analytics</h2>
+                <button class="btn" onclick="loadAnalytics()">Refresh Analytics</button>
+                <div id="analyticsResult">
+                    <div class="loading">Click "Refresh Analytics" to load current metrics</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function testMessage(message, resultContainer) {
+            const container = document.getElementById(resultContainer);
+            container.innerHTML = '<div class="loading">Processing message...</div>';
+
+            try {
+                const response = await fetch('/test/message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        userName: 'TestUser_' + Date.now()
+                    })
+                });
+
+                const result = await response.json();
+
+                let scoreClass = 'score-low';
+                if (result.leadScore >= 70) scoreClass = 'score-high';
+                else if (result.leadScore >= 40) scoreClass = 'score-medium';
+
+                container.innerHTML = `
+                    <div class="result">
+                        <h3>🎯 AI Analysis Results</h3>
+                        <p><strong>Input:</strong> "${message}"</p>
+                        <p><strong>Lead Score:</strong> <span class="score-badge ${scoreClass}">${result.leadScore}/100</span></p>
+                        <p><strong>Intent:</strong> ${result.analysis.intent}</p>
+                        <p><strong>Sentiment:</strong> ${result.analysis.sentiment}</p>
+                        <p><strong>Confidence:</strong> ${result.analysis.confidence}</p>
+                        <p><strong>Urgency:</strong> ${result.urgency}</p>
+                        ${result.mentionedProducts && result.mentionedProducts.length > 0 ?
+                            `<p><strong>Products Mentioned:</strong> ${result.mentionedProducts.map(p => p.name).join(', ')}</p>` : ''}
+                        ${result.orderStatus ? `<p><strong>Order Status:</strong> ${result.orderStatus}</p>` : ''}
+                        ${result.orderTotal ? `<p><strong>Order Total:</strong> $${result.orderTotal}</p>` : ''}
+                        <h4>🤖 Bot Response:</h4>
+                        <p style="background: #f8f9fa; padding: 15px; border-radius: 5px; font-style: italic;">
+                            "${result.response}"
+                        </p>
+                        <details>
+                            <summary>View Full JSON Response</summary>
+                            <pre>${JSON.stringify(result, null, 2)}</pre>
+                        </details>
+                    </div>
+                `;
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="result">
+                        <h3>❌ Error</h3>
+                        <p>Failed to test message: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function testManualMessage() {
+            const message = document.getElementById('manualMessage').value;
+            if (!message.trim()) {
+                alert('Please enter a message to test');
+                return;
+            }
+            testMessage(message, 'manualResult');
+        }
+
+        function testQuickMessage(message) {
+            testMessage(message, 'quickResult');
+        }
+
+        function clearResults() {
+            document.getElementById('manualResult').innerHTML = '';
+            document.getElementById('quickResult').innerHTML = '';
+            document.getElementById('manualMessage').value = '';
+        }
+
+        async function loadAnalytics() {
+            const container = document.getElementById('analyticsResult');
+            container.innerHTML = '<div class="loading">Loading analytics...</div>';
+
+            try {
+                const [metricsResponse, funnelResponse] = await Promise.all([
+                    fetch('/analytics/conversion/realtime'),
+                    fetch('/analytics/funnel?timeframe=7d')
+                ]);
+
+                const metrics = await metricsResponse.json();
+                const funnel = await funnelResponse.json();
+
+                container.innerHTML = `
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <h3>Total Customers</h3>
+                            <div class="value">${metrics.metrics.totalCustomers}</div>
+                        </div>
+                        <div class="analytics-card">
+                            <h3>Active Customers</h3>
+                            <div class="value">${metrics.metrics.activeCustomers}</div>
+                        </div>
+                        <div class="analytics-card">
+                            <h3>Conversion Rate</h3>
+                            <div class="value">${metrics.metrics.conversionRate}%</div>
+                        </div>
+                        <div class="analytics-card">
+                            <h3>Avg Engagement</h3>
+                            <div class="value">${metrics.metrics.averageEngagement}</div>
+                        </div>
+                    </div>
+                    <h3>Conversion Funnel</h3>
+                    <div style="background: white; padding: 20px; border-radius: 5px; margin-top: 15px;">
+                        ${Object.entries(funnel.funnel).map(([stage, data]) => `
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                                <span style="text-transform: capitalize; font-weight: bold;">${stage}:</span>
+                                <span>${data.count} customers (${data.dropoff}% dropoff)</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="result">
+                        <h3>❌ Analytics Error</h3>
+                        <p>Failed to load analytics: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Allow Enter key to submit manual message
+        document.getElementById('manualMessage').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                testManualMessage();
+            }
+        });
+
+        // Auto-load analytics on page load
+        window.addEventListener('load', function() {
+            setTimeout(loadAnalytics, 1000);
+        });
+    </script>
+</body>
+</html>

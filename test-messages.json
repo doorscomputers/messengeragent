@@ -1,0 +1,32 @@
+[
+  {
+    "message": "Hi! I am interested in your essential oils. How much do they cost?",
+    "language": "English",
+    "expected": "High lead score, product inquiry intent"
+  },
+  {
+    "message": "Magkano po ang essential oil set ninyo?",
+    "language": "Filipino",
+    "expected": "Price inquiry intent, medium lead score"
+  },
+  {
+    "message": "I want to buy 3 bottles of lavender oil now!",
+    "language": "English",
+    "expected": "Very high lead score, purchase intent, order processing"
+  },
+  {
+    "message": "Gusto ko po bumili ng dalawang bote ng lavender oil. Magkano po lahat?",
+    "language": "Filipino",
+    "expected": "High lead score, purchase intent with quantity"
+  },
+  {
+    "message": "Do you have any discounts or promos?",
+    "language": "English",
+    "expected": "Price conscious tag, promotion inquiry"
+  },
+  {
+    "message": "May discount po ba kayo ngayon? Saan ko pwedeng makuha?",
+    "language": "Filipino",
+    "expected": "Price conscious, delivery inquiry"
+  }
+]

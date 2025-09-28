@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent Setup Wizard - Business Intelligence Gathering</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-600: #4b5563;
+            --white: #ffffff;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .wizard-header {
+            background: var(--white);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .wizard-header h1 {
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .wizard-header p {
+            color: var(--gray-600);
+            font-size: 16px;
+        }
+
+        .progress-bar {
+            background: var(--gray-200);
+            height: 8px;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 16.66%;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .step::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: var(--gray-200);
+            z-index: -1;
+        }
+
+        .step:last-child::after {
+            display: none;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .step.active .step-circle {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .step.completed .step-circle {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: var(--gray-600);
+            text-align: center;
+        }
+
+        .wizard-content {
+            background: var(--white);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            min-height: 600px;
+        }
+
+        .step-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .form-section p {
+            color: var(--gray-600);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .info-card {
+            background: var(--gray-100);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .info-card h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .product-form {
+            background: var(--gray-100);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+        }
+
+        .product-form h4 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .faq-form {
+            background: var(--gray-100);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-secondary {
+            background: var(--gray-600);
+            color: var(--white);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-add {
+            background: var(--success);
+            color: var(--white);
+            margin-bottom: 20px;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .ai-preview {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--white);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+        }
+
+        .ai-preview h4 {
+            margin-bottom: 15px;
+        }
+
+        .response-preview {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            font-style: italic;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            transform: scale(1.2);
+        }
+
+        .tag-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            min-height: 50px;
+            align-items: center;
+        }
+
+        .tag {
+            background: var(--primary);
+            color: var(--white);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tag .remove {
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .success-animation {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .success-icon {
+            font-size: 64px;
+            color: var(--success);
+            margin-bottom: 20px;
+            animation: bounce 1s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-30px); }
+            60% { transform: translateY(-15px); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .wizard-content {
+                padding: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .step-indicator {
+                overflow-x: auto;
+                gap: 10px;
+            }
+
+            .step {
+                min-width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="wizard-header">
+            <h1><i class="fas fa-magic"></i> AI Agent Setup Wizard</h1>
+            <p>Let's gather your business information to create an intelligent sales agent that understands your products and customers</p>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step active" data-step="1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Business Info</div>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Products</div>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-circle">3</div>
+                <div class="step-label">Customer Q&A</div>
+            </div>
+            <div class="step" data-step="4">
+                <div class="step-circle">4</div>
+                <div class="step-label">Target Customers</div>
+            </div>
+            <div class="step" data-step="5">
+                <div class="step-circle">5</div>
+                <div class="step-label">Sales Strategy</div>
+            </div>
+            <div class="step" data-step="6">
+                <div class="step-circle">6</div>
+                <div class="step-label">AI Training</div>
+            </div>
+        </div>
+
+        <!-- Wizard Content -->
+        <div class="wizard-content">
+            <!-- Step 1: Business Information -->
+            <div class="step-content active" id="step1">
+                <div class="form-section">
+                    <h3><i class="fas fa-store"></i> Tell us about your business</h3>
+                    <p>This information helps our AI understand your brand and communicate professionally with customers.</p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="businessName">Business Name *</label>
+                            <input type="text" class="form-control" id="businessName" placeholder="e.g., Pure Essence Naturals" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="businessType">Business Category *</label>
+                            <select class="form-control" id="businessType" required>
+                                <option value="">Select Category</option>
+                                <option value="health-wellness">Health & Wellness</option>
+                                <option value="beauty-cosmetics">Beauty & Cosmetics</option>
+                                <option value="fashion-accessories">Fashion & Accessories</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="home-living">Home & Living</option>
+                                <option value="food-beverage">Food & Beverage</option>
+                                <option value="sports-fitness">Sports & Fitness</option>
+                                <option value="automotive">Automotive</option>
+                                <option value="services">Services</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="businessDescription">Business Description *</label>
+                        <textarea class="form-control" id="businessDescription" rows="4"
+                            placeholder="Describe what makes your business special. What do you sell? What's your unique value proposition?" required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input type="text" class="form-control" id="location" placeholder="e.g., Metro Manila, Philippines">
+                        </div>
+                        <div class="form-group">
+                            <label for="businessHours">Business Hours</label>
+                            <input type="text" class="form-control" id="businessHours" placeholder="e.g., Mon-Sat 9AM-8PM">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Contact Phone</label>
+                            <input type="tel" class="form-control" id="phone" placeholder="+63 917 123 4567">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Business Email</label>
+                            <input type="email" class="form-control" id="email" placeholder="orders@yourbusiness.com">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Payment Methods Accepted</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="cash" value="Cash">
+                                <label for="cash">Cash</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="gcash" value="GCash" checked>
+                                <label for="gcash">GCash</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="bank" value="Bank Transfer" checked>
+                                <label for="bank">Bank Transfer</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="cod" value="Cash on Delivery" checked>
+                                <label for="cod">Cash on Delivery</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="credit" value="Credit Card">
+                                <label for="credit">Credit Card</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="installment" value="Installment">
+                                <label for="installment">Installment</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Products -->
+            <div class="step-content" id="step2">
+                <div class="form-section">
+                    <h3><i class="fas fa-box"></i> Add your products</h3>
+                    <p>The more details you provide, the better our AI can recommend and sell your products.</p>
+
+                    <div class="info-card">
+                        <h4><i class="fas fa-lightbulb"></i> Pro Tip</h4>
+                        <p>Include keywords customers might use when searching. For essential oils: "stress relief", "natural", "aromatherapy", "organic", etc.</p>
+                    </div>
+
+                    <button class="btn btn-add" onclick="addProductForm()">
+                        <i class="fas fa-plus"></i> Add Product
+                    </button>
+
+                    <div id="productsContainer">
+                        <!-- Product forms will be added here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Customer Q&A -->
+            <div class="step-content" id="step3">
+                <div class="form-section">
+                    <h3><i class="fas fa-question-circle"></i> Common customer questions</h3>
+                    <p>Think about questions customers frequently ask. Our AI will learn these responses to provide instant, accurate answers.</p>
+
+                    <div class="info-card">
+                        <h4><i class="fas fa-robot"></i> AI Training</h4>
+                        <p>These Q&As train your AI agent to handle customer inquiries professionally and consistently, even when you're not available.</p>
+                    </div>
+
+                    <button class="btn btn-add" onclick="addFAQForm()">
+                        <i class="fas fa-plus"></i> Add Q&A
+                    </button>
+
+                    <div id="faqsContainer">
+                        <!-- FAQ forms will be added here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Target Customers -->
+            <div class="step-content" id="step4">
+                <div class="form-section">
+                    <h3><i class="fas fa-users"></i> Who are your customers?</h3>
+                    <p>Help our AI understand your target audience to personalize conversations and improve lead scoring.</p>
+
+                    <div class="form-group">
+                        <label>Primary Customer Age Range</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="age18-25" value="18-25">
+                                <label for="age18-25">18-25 years</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="age26-35" value="26-35">
+                                <label for="age26-35">26-35 years</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="age36-45" value="36-45">
+                                <label for="age36-45">36-45 years</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="age46-55" value="46-55">
+                                <label for="age46-55">46-55 years</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="age55plus" value="55+">
+                                <label for="age55plus">55+ years</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Customer Interests/Values (Select all that apply)</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="natural" value="Natural products">
+                                <label for="natural">Natural products</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="organic" value="Organic/Eco-friendly">
+                                <label for="organic">Organic/Eco-friendly</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="health" value="Health & wellness">
+                                <label for="health">Health & wellness</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="quality" value="High quality">
+                                <label for="quality">High quality</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="affordable" value="Affordable prices">
+                                <label for="affordable">Affordable prices</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="authentic" value="Authentic products">
+                                <label for="authentic">Authentic products</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customerPainPoints">What problems do your products solve?</label>
+                        <textarea class="form-control" id="customerPainPoints" rows="3"
+                            placeholder="e.g., stress, anxiety, sleep problems, skin issues, lack of energy..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="buyingMotivations">What motivates customers to buy from you?</label>
+                        <textarea class="form-control" id="buyingMotivations" rows="3"
+                            placeholder="e.g., trusted brand, fast delivery, excellent customer service, competitive prices..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Sales Strategy -->
+            <div class="step-content" id="step5">
+                <div class="form-section">
+                    <h3><i class="fas fa-chart-line"></i> Sales approach</h3>
+                    <p>Configure how aggressive or consultative you want your AI agent to be in sales conversations.</p>
+
+                    <div class="form-group">
+                        <label for="salesTone">Preferred Sales Tone</label>
+                        <select class="form-control" id="salesTone">
+                            <option value="consultative">Consultative - Focus on helping and educating</option>
+                            <option value="friendly">Friendly - Warm and approachable</option>
+                            <option value="professional">Professional - Business-like and efficient</option>
+                            <option value="enthusiastic">Enthusiastic - Energetic and passionate</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Sales Tactics (Select preferred approaches)</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="education" value="Educational approach">
+                                <label for="education">Educational approach</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="benefits" value="Benefits-focused">
+                                <label for="benefits">Benefits-focused</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="urgency" value="Urgency creation">
+                                <label for="urgency">Urgency creation</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="social" value="Social proof">
+                                <label for="social">Social proof</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="value" value="Value demonstration">
+                                <label for="value">Value demonstration</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="promotions">Current promotions or special offers</label>
+                        <textarea class="form-control" id="promotions" rows="3"
+                            placeholder="e.g., Free shipping over ₱1,500, Buy 2 Get 1 Free, 10% discount for first-time buyers..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="objectionHandling">How should AI handle price objections?</label>
+                        <textarea class="form-control" id="objectionHandling" rows="3"
+                            placeholder="e.g., Explain value, offer payment plans, suggest alternatives, provide guarantees..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 6: AI Training Complete -->
+            <div class="step-content" id="step6">
+                <div class="success-animation">
+                    <div class="success-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3>🎉 Your AI Agent is Ready!</h3>
+                    <p>All information has been processed and your intelligent sales agent is now trained with your business knowledge.</p>
+
+                    <div class="ai-preview">
+                        <h4><i class="fas fa-robot"></i> AI Response Preview</h4>
+                        <div class="response-preview" id="aiResponsePreview">
+                            <!-- AI response will be generated here -->
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <h4>🚀 Next Steps:</h4>
+                        <ol style="text-align: left; max-width: 500px; margin: 20px auto;">
+                            <li>Connect your Facebook Page</li>
+                            <li>Test your AI agent</li>
+                            <li>Start receiving and managing leads</li>
+                            <li>Monitor performance analytics</li>
+                        </ol>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <button class="btn btn-success" onclick="goToDashboard()">
+                            <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                        </button>
+                        <button class="btn btn-outline" onclick="testAgent()">
+                            <i class="fas fa-play"></i> Test Agent Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="navigation">
+                <button class="btn btn-secondary" id="prevBtn" onclick="prevStep()" style="display: none;">
+                    <i class="fas fa-arrow-left"></i> Previous
+                </button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="business-setup-wizard.js"></script>
+</body>
+</html>
