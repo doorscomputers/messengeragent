@@ -546,11 +546,16 @@ Contact: +63 917 123 4567"></textarea>
             }
 
             // Store data and redirect to bot setup
+            console.log('📦 Storing data for wizard:', extractedBusinessData);
             localStorage.setItem('extractedBusinessData', JSON.stringify(extractedBusinessData));
+
+            // Verify storage
+            const stored = localStorage.getItem('extractedBusinessData');
+            console.log('✅ Data stored successfully:', stored ? 'Yes' : 'No');
 
             // Show success and redirect
             alert('🎉 Data extracted successfully! Setting up your AI bot...');
-            window.location.href = '/business-setup-wizard.html?imported=true';
+            window.location.href = '/setup?imported=true';
         }
 
         function exportData() {

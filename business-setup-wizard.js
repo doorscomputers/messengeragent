@@ -32,9 +32,11 @@ class BusinessSetupWizard {
     loadImportedData() {
         try {
             const importedData = localStorage.getItem('extractedBusinessData');
+            console.log('🔍 Checking for imported data:', importedData ? 'Found' : 'Not found');
             if (importedData) {
                 console.log('📦 Loading imported business data...');
                 const data = JSON.parse(importedData);
+                console.log('📊 Parsed data:', data);
 
                 // Pre-fill business info
                 if (data.business_info) {
@@ -73,6 +75,11 @@ class BusinessSetupWizard {
 
                 // Show import success message
                 this.showImportSuccess(data);
+
+                // Populate form fields with imported data after a short delay
+                setTimeout(() => {
+                    this.populateFormsWithImportedData();
+                }, 500);
 
                 // Clear the imported data
                 localStorage.removeItem('extractedBusinessData');
@@ -113,13 +120,211 @@ class BusinessSetupWizard {
         }
     }
 
+    // Populate form fields with imported data
+    populateFormsWithImportedData() {
+        console.log('📝 Populating forms with imported data...');
+
+        // Step 1: Business Info
+        if (this.businessData.businessInfo) {
+            const businessName = document.getElementById('businessName');
+            const businessType = document.getElementById('businessType');
+            const businessDescription = document.getElementById('businessDescription');
+            const businessHours = document.getElementById('businessHours');
+            const email = document.getElementById('email');
+
+            if (businessName && this.businessData.businessInfo.name) {
+                businessName.value = this.businessData.businessInfo.name;
+                console.log('✅ Set business name:', this.businessData.businessInfo.name);
+            }
+            if (businessType && this.businessData.businessInfo.category) {
+                // Intelligently map AI category to dropdown options
+                const aiCategory = this.businessData.businessInfo.category.toLowerCase();
+                const categoryMappings = {
+                    'retail': 'retail',
+                    'essential oils': 'health',
+                    'oils': 'health',
+                    'beauty': 'beauty',
+                    'health': 'health',
+                    'wellness': 'health',
+                    'food': 'food',
+                    'restaurant': 'food',
+                    'clothing': 'fashion',
+                    'fashion': 'fashion',
+                    'services': 'services',
+                    'technology': 'technology',
+                    'education': 'education'
+                };
+
+                // Find best match or use the AI category directly
+                let selectedCategory = businessType.value;
+                for (const [key, value] of Object.entries(categoryMappings)) {
+                    if (aiCategory.includes(key)) {
+                        selectedCategory = value;
+                        break;
+                    }
+                }
+
+                // If no mapping found, try to add the AI category as an option
+                if (!selectedCategory || selectedCategory === businessType.value) {
+                    const newOption = document.createElement('option');
+                    newOption.value = this.businessData.businessInfo.category;
+                    newOption.textContent = this.businessData.businessInfo.category;
+                    businessType.appendChild(newOption);
+                    selectedCategory = this.businessData.businessInfo.category;
+                }
+
+                businessType.value = selectedCategory;
+                console.log('✅ Set business type:', selectedCategory);
+            }
+            if (businessDescription && this.businessData.businessInfo.description) {
+                businessDescription.value = this.businessData.businessInfo.description;
+                console.log('✅ Set business description');
+            }
+            if (businessHours && this.businessData.businessDetails?.business_hours) {
+                businessHours.value = this.businessData.businessDetails.business_hours;
+                console.log('✅ Set business hours');
+            }
+            if (email && this.businessData.businessDetails?.contact_info?.email) {
+                email.value = this.businessData.businessDetails.contact_info.email;
+                console.log('✅ Set email');
+            }
+
+            // Intelligently fill additional fields from AI data
+            const phoneInput = document.getElementById('phone');
+            const locationInput = document.getElementById('location');
+
+            if (phoneInput && this.businessData.businessDetails?.contact_info?.phone) {
+                phoneInput.value = this.businessData.businessDetails.contact_info.phone;
+                console.log('✅ Set phone:', this.businessData.businessDetails.contact_info.phone);
+            }
+
+            if (locationInput && this.businessData.businessDetails?.contact_info?.address) {
+                locationInput.value = this.businessData.businessDetails.contact_info.address;
+                console.log('✅ Set location:', this.businessData.businessDetails.contact_info.address);
+            }
+
+            // Auto-check payment methods based on AI extraction
+            if (this.businessData.businessDetails?.payment_methods) {
+                const paymentMethods = this.businessData.businessDetails.payment_methods;
+
+                // Check appropriate payment method checkboxes
+                if (paymentMethods.includes('COD') || paymentMethods.includes('Cash on Delivery')) {
+                    const codCheckbox = document.querySelector('input[type="checkbox"][value*="cod"]') ||
+                                       document.querySelector('input[type="checkbox"]') ||
+                                       document.getElementById('cod');
+                    if (codCheckbox) {
+                        codCheckbox.checked = true;
+                        console.log('✅ Set COD payment method');
+                    }
+                }
+
+                if (paymentMethods.includes('GCash')) {
+                    const gcashCheckbox = document.querySelector('input[type="checkbox"][value*="gcash"]') ||
+                                         document.getElementById('gcash');
+                    if (gcashCheckbox) {
+                        gcashCheckbox.checked = true;
+                        console.log('✅ Set GCash payment method');
+                    }
+                }
+
+                if (paymentMethods.includes('Bank Transfer')) {
+                    const bankCheckbox = document.querySelector('input[type="checkbox"][value*="bank"]') ||
+                                        document.getElementById('bank');
+                    if (bankCheckbox) {
+                        bankCheckbox.checked = true;
+                        console.log('✅ Set Bank Transfer payment method');
+                    }
+                }
+            }
+        }
+
+        // Clear existing product forms and add imported products
+        if (this.businessData.products && this.businessData.products.length > 0) {
+            const productContainer = document.getElementById('productsContainer');
+            if (productContainer) {
+                productContainer.innerHTML = ''; // Clear existing forms
+                this.productCounter = 0;
+
+                // Add each imported product
+                this.businessData.products.forEach((product, index) => {
+                    this.addProductForm();
+                    const currentForm = productContainer.lastElementChild;
+
+                    if (currentForm) {
+                        const nameInput = currentForm.querySelector('.product-name');
+                        const priceInput = currentForm.querySelector('.product-price');
+                        const categoryInput = currentForm.querySelector('.product-category');
+                        const descriptionInput = currentForm.querySelector('.product-description');
+
+                        if (nameInput) {
+                            nameInput.value = product.name || '';
+                            console.log('✅ Set product name:', product.name);
+                        }
+                        if (priceInput) {
+                            priceInput.value = product.price || '';
+                            console.log('✅ Set product price:', product.price);
+                        }
+                        if (categoryInput) {
+                            categoryInput.value = product.category || '';
+                            console.log('✅ Set product category:', product.category);
+                        }
+                        if (descriptionInput) {
+                            descriptionInput.value = product.description || '';
+                            console.log('✅ Set product description');
+                        }
+                    }
+                });
+            }
+        }
+
+        // Clear existing FAQ forms and add imported FAQs
+        if (this.businessData.faqs && this.businessData.faqs.length > 0) {
+            const faqContainer = document.getElementById('faqsContainer');
+            if (faqContainer) {
+                faqContainer.innerHTML = ''; // Clear existing forms
+                this.faqCounter = 0;
+
+                // Add each imported FAQ
+                this.businessData.faqs.forEach((faq, index) => {
+                    this.addFAQForm();
+                    const currentForm = faqContainer.lastElementChild;
+
+                    if (currentForm) {
+                        const questionInput = currentForm.querySelector('.faq-question');
+                        const answerInput = currentForm.querySelector('.faq-answer');
+
+                        if (questionInput) {
+                            questionInput.value = faq.question || '';
+                            console.log('✅ Set FAQ question:', faq.question);
+                        }
+                        if (answerInput) {
+                            answerInput.value = faq.answer || '';
+                            console.log('✅ Set FAQ answer');
+                        }
+                    }
+                });
+            }
+        }
+
+        console.log('✅ Forms populated with imported data');
+    }
+
     // Add initial product and FAQ forms
     addInitialForms() {
-        // Add one product form to start
-        this.addProductForm();
-        // Add a few FAQ forms to start
-        this.addFAQForm();
-        this.addFAQForm();
+        // Only add default forms if no imported data
+        const hasImportedProducts = this.businessData.products && this.businessData.products.length > 0;
+        const hasImportedFAQs = this.businessData.faqs && this.businessData.faqs.length > 0;
+
+        if (!hasImportedProducts) {
+            // Add one product form to start
+            this.addProductForm();
+        }
+
+        if (!hasImportedFAQs) {
+            // Add a few FAQ forms to start
+            this.addFAQForm();
+            this.addFAQForm();
+        }
     }
 
     // Navigation
