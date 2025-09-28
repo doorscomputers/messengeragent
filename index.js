@@ -241,6 +241,15 @@ app.get('/dashboard.js', (req, res) => {
   res.sendFile(__dirname + '/dashboard.js');
 });
 
+// Privacy Policy route for Facebook App Review
+app.get('/privacy', (req, res) => {
+  res.sendFile(__dirname + '/privacy-policy.html');
+});
+
+app.get('/privacy-policy', (req, res) => {
+  res.sendFile(__dirname + '/privacy-policy.html');
+});
+
 // Business Setup Wizard routes
 app.get('/setup', (req, res) => {
   res.sendFile(__dirname + '/business-setup-wizard.html');
