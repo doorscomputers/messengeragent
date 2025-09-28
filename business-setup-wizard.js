@@ -20,8 +20,97 @@ class BusinessSetupWizard {
 
     init() {
         console.log('🧙‍♂️ Business Setup Wizard initialized');
+
+        // Check for imported data from Smart Import
+        this.loadImportedData();
+
         this.updateProgress();
         this.addInitialForms();
+    }
+
+    // Load data from Smart Import if available
+    loadImportedData() {
+        try {
+            const importedData = localStorage.getItem('extractedBusinessData');
+            if (importedData) {
+                console.log('📦 Loading imported business data...');
+                const data = JSON.parse(importedData);
+
+                // Pre-fill business info
+                if (data.business_info) {
+                    this.businessData.businessInfo = {
+                        name: data.business_info.name || '',
+                        category: data.business_info.type || data.business_info.category || '',
+                        description: data.business_info.description || '',
+                        location: data.business_info.location || ''
+                    };
+                }
+
+                // Pre-fill products
+                if (data.products && data.products.length > 0) {
+                    this.businessData.products = data.products.map(product => ({
+                        name: product.name || '',
+                        price: product.price || '',
+                        category: product.category || '',
+                        description: product.description || '',
+                        keywords: Array.isArray(product.keywords) ? product.keywords.join(', ') : ''
+                    }));
+                }
+
+                // Pre-fill FAQs
+                if (data.faqs && data.faqs.length > 0) {
+                    this.businessData.faqs = data.faqs.map(faq => ({
+                        question: faq.question || '',
+                        answer: faq.answer || '',
+                        category: faq.category || 'general'
+                    }));
+                }
+
+                // Pre-fill business details
+                if (data.business_details) {
+                    this.businessData.businessDetails = data.business_details;
+                }
+
+                // Show import success message
+                this.showImportSuccess(data);
+
+                // Clear the imported data
+                localStorage.removeItem('extractedBusinessData');
+
+                console.log('✅ Imported data loaded successfully');
+            }
+        } catch (error) {
+            console.error('❌ Error loading imported data:', error);
+        }
+    }
+
+    // Show import success message
+    showImportSuccess(data) {
+        const successMessage = document.createElement('div');
+        successMessage.className = 'import-success-banner';
+        successMessage.innerHTML = `
+            <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
+                <i class="fas fa-check-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                <h3>🎉 Smart Import Successful!</h3>
+                <p>AI extracted your business data automatically:</p>
+                <div style="display: flex; justify-content: center; gap: 20px; margin-top: 15px; flex-wrap: wrap;">
+                    <span><strong>${data.products?.length || 0}</strong> Products</span>
+                    <span><strong>${data.faqs?.length || 0}</strong> FAQs</span>
+                    <span><strong>1</strong> Business Profile</span>
+                </div>
+                <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.9;">Review and customize the pre-filled information below</p>
+            </div>
+        `;
+
+        const container = document.querySelector('.container');
+        if (container) {
+            container.insertBefore(successMessage, container.firstChild);
+
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                successMessage.remove();
+            }, 10000);
+        }
     }
 
     // Add initial product and FAQ forms
