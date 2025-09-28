@@ -343,6 +343,12 @@ class AIIntelligence {
         const mentionedProducts = [];
         const messageLower = message.toLowerCase();
 
+        // Safety check: ensure products is an array
+        if (!products || !Array.isArray(products)) {
+            console.log('⚠️ No products array provided, using default products');
+            products = this.businessConfig?.products || [];
+        }
+
         products.forEach(product => {
             // Check product name
             if (messageLower.includes(product.name.toLowerCase())) {
