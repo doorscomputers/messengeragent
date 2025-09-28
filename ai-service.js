@@ -189,8 +189,11 @@ Scoring guidelines:
     async generateResponse(message, analysis, businessConfig = {}) {
         try {
             if (!this.hasOpenAI) {
+                console.log('⚠️ OpenAI not available, using fallback response');
                 return this.fallbackResponse(analysis, businessConfig);
             }
+
+            console.log('🤖 Using OpenAI to generate response...');
 
             const context = this.buildResponseContext(analysis, businessConfig);
 

@@ -400,11 +400,8 @@ class OrderProcessor {
             };
         }
 
-        return {
-            response: "I'd love to help you find the perfect product! What are you looking for today? 😊",
-            orderStatus: 'browsing',
-            nextAction: 'product_discovery'
-        };
+        // Let AI service handle general inquiries for better intelligence
+        return null;
     }
 
     // Create final order record
