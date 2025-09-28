@@ -123,8 +123,9 @@ class BusinessSetupWizard {
     // Populate form fields with imported data
     populateFormsWithImportedData() {
         console.log('📝 Populating forms with imported data...');
+        console.log('🤖 AI fills FACTUAL data only. Strategic fields left for seller input.');
 
-        // Step 1: Business Info
+        // Step 1: Business Info - AI fills factual business data
         if (this.businessData.businessInfo) {
             const businessName = document.getElementById('businessName');
             const businessType = document.getElementById('businessType');
@@ -272,6 +273,50 @@ class BusinessSetupWizard {
                             descriptionInput.value = product.description || '';
                             console.log('✅ Set product description');
                         }
+
+                        // Intelligently fill keywords from AI extraction or generate from name/description
+                        const keywordsInput = currentForm.querySelector('.product-keywords') ||
+                                            currentForm.querySelector('input[placeholder*="keyword"]') ||
+                                            currentForm.querySelector('[name*="keyword"]');
+
+                        if (keywordsInput) {
+                            let keywords = '';
+
+                            // Use AI-extracted keywords if available
+                            if (product.keywords && Array.isArray(product.keywords)) {
+                                keywords = product.keywords.join(', ');
+                            } else if (product.keywords && typeof product.keywords === 'string') {
+                                keywords = product.keywords;
+                            } else {
+                                // Generate intelligent keywords from product name and description
+                                const name = (product.name || '').toLowerCase();
+                                const desc = (product.description || '').toLowerCase();
+                                const autoKeywords = [];
+
+                                // Extract meaningful words from name and description
+                                const words = [...name.split(' '), ...desc.split(' ')];
+                                const meaningfulWords = words.filter(word =>
+                                    word.length > 2 &&
+                                    !['the', 'and', 'for', 'with', 'oil', 'product'].includes(word)
+                                );
+
+                                // Add category-specific keywords
+                                if (name.includes('lavender')) autoKeywords.push('lavender', 'relaxation', 'aromatherapy');
+                                if (name.includes('lemon')) autoKeywords.push('lemon', 'citrus', 'energizing');
+                                if (name.includes('tea tree')) autoKeywords.push('tea tree', 'antibacterial', 'skincare');
+                                if (desc.includes('pure')) autoKeywords.push('pure', 'natural');
+                                if (desc.includes('therapeutic')) autoKeywords.push('therapeutic', 'wellness');
+
+                                // Combine and deduplicate
+                                const allKeywords = [...new Set([...autoKeywords, ...meaningfulWords.slice(0, 3)])];
+                                keywords = allKeywords.slice(0, 6).join(', ');
+                            }
+
+                            if (keywords) {
+                                keywordsInput.value = keywords;
+                                console.log('✅ Set product keywords:', keywords);
+                            }
+                        }
                     }
                 });
             }
@@ -305,6 +350,14 @@ class BusinessSetupWizard {
                 });
             }
         }
+
+        // STRATEGIC FIELDS - Left empty for seller input (not AI-filled)
+        // These require business insight and should be filled by the seller:
+        // - customerPainPoints (What problems do your products solve?)
+        // - buyingMotivations (What motivates customers to buy from you?)
+        // - businessPersonality (How should AI sound when representing your business?)
+        // - communicationTone (Professional, friendly, energetic, etc.)
+        console.log('💭 Strategic fields left empty for seller expertise');
 
         console.log('✅ Forms populated with imported data');
     }
