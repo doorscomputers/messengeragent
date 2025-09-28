@@ -246,6 +246,11 @@ app.get('/setup', (req, res) => {
   res.sendFile(__dirname + '/business-setup-wizard.html');
 });
 
+// Smart Import Wizard route
+app.get('/smart-import', (req, res) => {
+  res.sendFile(__dirname + '/smart-import-wizard.html');
+});
+
 app.get('/business-setup-wizard.js', (req, res) => {
   res.sendFile(__dirname + '/business-setup-wizard.js');
 });
