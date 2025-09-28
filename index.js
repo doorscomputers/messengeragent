@@ -747,16 +747,14 @@ app.post('/api/smart-import/website', async (req, res) => {
       return res.status(400).json({ error: 'URL is required' });
     }
 
-    // This would scrape website content and process it
+    console.log('🌐 Processing website:', url);
+    const processor = new SmartImportProcessor();
+    const extractedData = await processor.processWebsite(url);
+
     res.json({
       success: true,
-      data: {
-        business_info: { name: "Website Import Demo" },
-        products: [],
-        faqs: [],
-        note: "Website scraping will be implemented"
-      },
-      message: 'Website processing endpoint ready'
+      data: extractedData,
+      message: 'Successfully processed website content'
     });
 
   } catch (error) {

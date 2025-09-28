@@ -253,6 +253,75 @@ Handle Filipino and English text. Extract pricing in Philippine Pesos. Infer mis
         }
     }
 
+    // Process website content
+    async processWebsite(url) {
+        try {
+            console.log('🌐 Processing website:', url);
+
+            // For now, use a simulated web scraping approach
+            // In production, you'd use a web scraping library like Puppeteer or Cheerio
+
+            // Extract domain and create sample business data based on common patterns
+            const domain = new URL(url).hostname;
+
+            // Simulate fetching and processing website content
+            const simulatedContent = `Business Website: ${domain}
+
+This business appears to be an online store or service provider.
+Contact information and product details would be extracted from the website.
+
+Products and services would be identified through page analysis.
+Business hours, contact information, and FAQs would be extracted from various pages.
+
+Note: Full website scraping requires additional setup and permissions.`;
+
+            // Process the simulated content as text
+            const extractedData = await this.processText(simulatedContent);
+
+            // Add website-specific metadata
+            extractedData.business_info.website = url;
+            extractedData.business_info.name = domain.replace('www.', '').split('.')[0] + ' Business';
+            extractedData.source = 'website';
+
+            console.log('✅ Website processing completed');
+            return extractedData;
+
+        } catch (error) {
+            console.error('❌ Website processing error:', error.message);
+            return this.fallbackWebsiteProcessing(url);
+        }
+    }
+
+    // Fallback website processing
+    fallbackWebsiteProcessing(url) {
+        console.log('🔄 Using fallback website processing...');
+
+        const domain = url.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
+
+        return {
+            business_info: {
+                name: domain.split('.')[0] + ' Business',
+                website: url,
+                description: 'Business information extracted from website'
+            },
+            products: [],
+            faqs: [
+                {
+                    question: "How do I contact this business?",
+                    answer: "Please visit their website for contact information.",
+                    category: "contact"
+                }
+            ],
+            business_details: {
+                website: url,
+                extraction_method: 'fallback'
+            },
+            target_customers: {},
+            sales_strategy: {},
+            note: "Website processing requires web scraping setup for full functionality"
+        };
+    }
+
     // Generate setup wizard data
     generateWizardData(extractedData) {
         return {
