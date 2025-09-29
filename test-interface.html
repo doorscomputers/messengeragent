@@ -266,10 +266,10 @@
                         <h3>🎯 AI Analysis Results</h3>
                         <p><strong>Input:</strong> "${message}"</p>
                         <p><strong>Lead Score:</strong> <span class="score-badge ${scoreClass}">${result.leadScore}/100</span></p>
-                        <p><strong>Intent:</strong> ${result.analysis.intent}</p>
-                        <p><strong>Sentiment:</strong> ${result.analysis.sentiment}</p>
-                        <p><strong>Confidence:</strong> ${result.analysis.confidence}</p>
-                        <p><strong>Urgency:</strong> ${result.urgency}</p>
+                        <p><strong>Intent:</strong> ${result.analysis?.intent || 'N/A'}</p>
+                        <p><strong>Sentiment:</strong> ${result.analysis?.sentiment || 'N/A'}</p>
+                        <p><strong>Confidence:</strong> ${result.analysis?.confidence || 'N/A'}</p>
+                        <p><strong>Urgency:</strong> ${result.urgency || 'N/A'}</p>
                         ${result.mentionedProducts && result.mentionedProducts.length > 0 ?
                             `<p><strong>Products Mentioned:</strong> ${result.mentionedProducts.map(p => p.name).join(', ')}</p>` : ''}
                         ${result.orderStatus ? `<p><strong>Order Status:</strong> ${result.orderStatus}</p>` : ''}
