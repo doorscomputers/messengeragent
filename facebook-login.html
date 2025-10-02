@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Login - FB Messenger Agent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #1877f2;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .logo p {
+            color: #65676b;
+            font-size: 0.95rem;
+        }
+
+        .feature-list {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f0f2f5;
+            border-radius: 8px;
+        }
+
+        .feature-list h3 {
+            color: #1c1e21;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: #65676b;
+            font-size: 0.9rem;
+        }
+
+        .feature-item svg {
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .permissions-info {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .permissions-info h4 {
+            color: #856404;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+
+        .permissions-info ul {
+            margin-left: 20px;
+            color: #856404;
+            font-size: 0.85rem;
+        }
+
+        .permissions-info li {
+            margin-bottom: 5px;
+        }
+
+        .fb-login-btn {
+            width: 100%;
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .fb-login-btn:hover {
+            background: #166fe5;
+        }
+
+        .fb-login-btn:disabled {
+            background: #e4e6eb;
+            color: #8a8d91;
+            cursor: not-allowed;
+        }
+
+        .fb-logo {
+            width: 24px;
+            height: 24px;
+        }
+
+        .status-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .connected-pages {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e4e6eb;
+        }
+
+        .connected-pages h3 {
+            color: #1c1e21;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .page-item {
+            background: #f0f2f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-info {
+            flex: 1;
+        }
+
+        .page-info h4 {
+            color: #1c1e21;
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .page-info p {
+            color: #65676b;
+            font-size: 0.85rem;
+        }
+
+        .page-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #1877f2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #166fe5;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .privacy-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #65676b;
+            font-size: 0.85rem;
+        }
+
+        .privacy-link a {
+            color: #1877f2;
+            text-decoration: none;
+        }
+
+        .privacy-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .logo h1 {
+                font-size: 1.5rem;
+            }
+
+            .page-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .page-actions {
+                margin-top: 10px;
+                width: 100%;
+            }
+
+            .btn-small {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>💬 FB Messenger Agent</h1>
+            <p>Connect your Facebook Pages to get started</p>
+        </div>
+
+        <div class="feature-list">
+            <h3>What you'll be able to do:</h3>
+            <div class="feature-item">
+                <svg width="20" height="20" fill="#28a745" viewBox="0 0 20 20">
+                    <path d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm-2 15l-5-5 1.41-1.41L8 12.17l7.59-7.59L17 6l-9 9z"/>
+                </svg>
+                <span>Automatically respond to customer messages on Messenger</span>
+            </div>
+            <div class="feature-item">
+                <svg width="20" height="20" fill="#28a745" viewBox="0 0 20 20">
+                    <path d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm-2 15l-5-5 1.41-1.41L8 12.17l7.59-7.59L17 6l-9 9z"/>
+                </svg>
+                <span>Track customer leads and conversations</span>
+            </div>
+            <div class="feature-item">
+                <svg width="20" height="20" fill="#28a745" viewBox="0 0 20 20">
+                    <path d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm-2 15l-5-5 1.41-1.41L8 12.17l7.59-7.59L17 6l-9 9z"/>
+                </svg>
+                <span>AI-powered product recommendations</span>
+            </div>
+            <div class="feature-item">
+                <svg width="20" height="20" fill="#28a745" viewBox="0 0 20 20">
+                    <path d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm-2 15l-5-5 1.41-1.41L8 12.17l7.59-7.59L17 6l-9 9z"/>
+                </svg>
+                <span>Analytics and performance insights</span>
+            </div>
+        </div>
+
+        <div class="permissions-info">
+            <h4>🔒 Permissions We'll Request:</h4>
+            <ul>
+                <li><strong>pages_show_list</strong> - View your Pages</li>
+                <li><strong>pages_manage_metadata</strong> - Manage Page settings and webhooks</li>
+                <li><strong>pages_messaging</strong> - Send and receive messages</li>
+                <li><strong>business_management</strong> - Connect your business</li>
+            </ul>
+        </div>
+
+        <button id="fbLoginBtn" class="fb-login-btn">
+            <svg class="fb-logo" viewBox="0 0 24 24" fill="white">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+            <span id="btnText">Continue with Facebook</span>
+        </button>
+
+        <div id="statusMessage"></div>
+
+        <div id="connectedPages" class="connected-pages" style="display: none;">
+            <h3>Connected Pages</h3>
+            <div id="pagesList"></div>
+        </div>
+
+        <div class="privacy-link">
+            By continuing, you agree to our <a href="/privacy-policy">Privacy Policy</a>
+        </div>
+    </div>
+
+    <!-- Facebook SDK -->
+    <script>
+        // Configuration - Replace with your actual Facebook App ID
+        const FB_APP_ID = '671005738903644'; // Your actual App ID
+        const PERMISSIONS = [
+            'pages_show_list',
+            'pages_manage_metadata',
+            'pages_messaging',
+            'business_management'
+        ];
+
+        let connectedPages = [];
+
+        // Initialize Facebook SDK
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId: FB_APP_ID,
+                cookie: true,
+                xfbml: true,
+                version: 'v22.0'
+            });
+
+            // Check login status on page load
+            FB.getLoginStatus(function(response) {
+                console.log('Initial login status:', response);
+                if (response.status === 'connected') {
+                    handleLoginSuccess(response);
+                }
+            });
+        };
+
+        // Load Facebook SDK
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        // Login button handler
+        document.getElementById('fbLoginBtn').addEventListener('click', function() {
+            const btn = this;
+            btn.disabled = true;
+            document.getElementById('btnText').innerHTML = '<span class="loading-spinner"></span> Connecting...';
+
+            FB.login(function(response) {
+                console.log('Login response:', response);
+
+                if (response.status === 'connected') {
+                    handleLoginSuccess(response);
+                } else {
+                    showMessage('Login cancelled or failed. Please try again.', 'error');
+                    btn.disabled = false;
+                    document.getElementById('btnText').textContent = 'Continue with Facebook';
+                }
+            }, {
+                scope: PERMISSIONS.join(','),
+                return_scopes: true,
+                auth_type: 'rerequest'
+            });
+        });
+
+        async function handleLoginSuccess(response) {
+            console.log('Login successful:', response);
+            showMessage('Successfully connected to Facebook!', 'success');
+
+            const accessToken = response.authResponse.accessToken;
+            const userId = response.authResponse.userID;
+
+            // Update button
+            const btn = document.getElementById('fbLoginBtn');
+            btn.disabled = true;
+            document.getElementById('btnText').textContent = '✓ Connected';
+            btn.classList.add('btn-success');
+
+            // Get user info
+            FB.api('/me', { fields: 'name,email' }, function(userResponse) {
+                console.log('User info:', userResponse);
+            });
+
+            // Get pages list (demonstrates pages_show_list permission)
+            FB.api('/me/accounts', { fields: 'id,name,access_token,category' }, async function(pagesResponse) {
+                console.log('Pages response:', pagesResponse);
+
+                if (pagesResponse.data && pagesResponse.data.length > 0) {
+                    connectedPages = pagesResponse.data;
+                    displayPages(pagesResponse.data);
+
+                    // Send to backend
+                    await saveToBackend({
+                        userId: userId,
+                        userAccessToken: accessToken,
+                        pages: pagesResponse.data
+                    });
+                } else {
+                    showMessage('No pages found. You need to have a Facebook Page to use this app.', 'info');
+                }
+            });
+
+            // Get business accounts (demonstrates business_management permission)
+            FB.api('/me/businesses', { fields: 'id,name' }, function(businessResponse) {
+                console.log('Business accounts:', businessResponse);
+
+                if (businessResponse.data && businessResponse.data.length > 0) {
+                    showMessage(`✓ Connected to ${businessResponse.data.length} business account(s)`, 'success');
+                    console.log('Business accounts connected:', businessResponse.data);
+
+                    // Display business info
+                    businessResponse.data.forEach(business => {
+                        console.log(`- ${business.name} (ID: ${business.id})`);
+                    });
+                } else {
+                    console.log('No business accounts found or permission not granted');
+                }
+            });
+        }
+
+        function displayPages(pages) {
+            const connectedPagesDiv = document.getElementById('connectedPages');
+            const pagesList = document.getElementById('pagesList');
+
+            connectedPagesDiv.style.display = 'block';
+            pagesList.innerHTML = '';
+
+            pages.forEach(page => {
+                const pageItem = document.createElement('div');
+                pageItem.className = 'page-item';
+                pageItem.innerHTML = `
+                    <div class="page-info">
+                        <h4>${page.name}</h4>
+                        <p>Category: ${page.category || 'N/A'} • ID: ${page.id}</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn-small btn-primary" onclick="subscribeWebhook('${page.id}', '${page.access_token}')">
+                            Subscribe Webhooks
+                        </button>
+                        <button class="btn-small btn-success" onclick="sendTestMessage('${page.id}', '${page.access_token}')">
+                            Send Test Message
+                        </button>
+                    </div>
+                `;
+                pagesList.appendChild(pageItem);
+            });
+        }
+
+        async function subscribeWebhook(pageId, pageAccessToken) {
+            showMessage('Subscribing to webhooks...', 'info');
+
+            try {
+                // This demonstrates pages_manage_metadata permission
+                const response = await fetch(`https://graph.facebook.com/v22.0/${pageId}/subscribed_apps`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        subscribed_fields: ['messages', 'messaging_postbacks', 'messaging_optins', 'message_deliveries'],
+                        access_token: pageAccessToken
+                    })
+                });
+
+                const data = await response.json();
+                console.log('Webhook subscription response:', data);
+
+                if (data.success) {
+                    showMessage('✓ Webhooks subscribed successfully!', 'success');
+                } else {
+                    showMessage('Failed to subscribe webhooks: ' + (data.error?.message || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Webhook subscription error:', error);
+                showMessage('Error subscribing webhooks: ' + error.message, 'error');
+            }
+        }
+
+        async function sendTestMessage(pageId, pageAccessToken) {
+            // This demonstrates pages_messaging permission
+            // For demo purposes, we'll send a message to a test user
+            showMessage('Test message functionality is ready. In production, this sends messages to Messenger users.', 'info');
+
+            console.log('Test message would be sent from page:', pageId);
+            // Actual implementation would send via /me/messages endpoint
+        }
+
+        async function saveToBackend(data) {
+            try {
+                const response = await fetch('/api/facebook/connect', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                console.log('Saved to backend:', result);
+            } catch (error) {
+                console.error('Error saving to backend:', error);
+            }
+        }
+
+        function showMessage(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = `status-message ${type}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>

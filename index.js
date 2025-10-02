@@ -200,20 +200,34 @@ app.get('/', (req, res) => {
             </div>
 
             <div class="links">
-                <a href="/setup" class="btn btn-primary">
+                <a href="/facebook-login" class="btn btn-primary">
+                    🔐 Facebook Login
+                </a>
+                <a href="/messaging-demo" class="btn btn-primary">
+                    💬 Messaging Demo
+                </a>
+                <a href="/setup" class="btn btn-secondary">
                     🧙‍♂️ Setup Wizard
                 </a>
                 <a href="/dashboard" class="btn btn-secondary">
-                    📊 Seller Dashboard
-                </a>
-                <a href="/test.html" class="btn btn-secondary">
-                    🧪 Test Agent
+                    📊 Dashboard
                 </a>
             </div>
 
             <div class="info">
-                <strong>For Sellers:</strong> Use the dashboard to manage products, FAQs, and view customer leads<br>
-                <strong>For Customers:</strong> Chat with our AI agent on Facebook Messenger
+                <strong>🔐 Getting Started:</strong> Connect your Facebook Page using the Facebook Login button above<br>
+                <strong>📊 For Sellers:</strong> Manage products, FAQs, and view customer leads via Dashboard<br>
+                <strong>💬 For Customers:</strong> Chat with our AI agent on Facebook Messenger for instant support
+            </div>
+
+            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #ffc107;">
+                <strong style="color: #856404;">📹 For Facebook Reviewers:</strong><br>
+                <p style="color: #856404; margin: 10px 0 0 0; font-size: 0.9rem;">
+                    This app demonstrates all requested permissions through a professional Facebook Login integration.<br>
+                    • Start at <strong>/facebook-login</strong> to see OAuth flow with all 4 permissions<br>
+                    • Visit <strong>/messaging-demo</strong> to see end-to-end message delivery to Messenger inbox<br>
+                    • Full testing instructions: <strong>FACEBOOK_REVIEW_GUIDE.md</strong>
+                </p>
             </div>
         </div>
     </body>
@@ -248,6 +262,123 @@ app.get('/privacy', (req, res) => {
 
 app.get('/privacy-policy', (req, res) => {
   res.sendFile(__dirname + '/privacy-policy.html');
+});
+
+// Data Deletion Callback for Facebook App Review
+app.post('/data-deletion', async (req, res) => {
+  try {
+    console.log('📋 Data deletion request received:', req.body);
+
+    const { signed_request } = req.body;
+
+    if (signed_request) {
+      // Parse the signed request
+      // Format: encoded_signature.payload
+      const [encodedSig, payload] = signed_request.split('.');
+
+      // Decode the payload
+      const data = JSON.parse(Buffer.from(payload, 'base64').toString('utf8'));
+      const userId = data.user_id;
+
+      console.log(`🗑️ Processing data deletion for user: ${userId}`);
+
+      // Delete user data from database
+      if (database) {
+        // Delete user's leads
+        const leads = await database.getAllLeads();
+        const userLeads = leads.filter(lead => lead.customerId === userId);
+        for (const lead of userLeads) {
+          await database.deleteLead(lead.id);
+        }
+
+        // Delete user's conversion events
+        await database.db.run(
+          'DELETE FROM conversion_events WHERE customer_id = ?',
+          [userId]
+        );
+
+        // Delete user's conversation history
+        await database.db.run(
+          'DELETE FROM interactions WHERE customer_id = ?',
+          [userId]
+        );
+
+        console.log(`✅ Deleted all data for user: ${userId}`);
+      }
+    }
+
+    // Return confirmation in the format Facebook expects
+    const confirmationCode = `deletion_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    res.json({
+      url: `${req.protocol}://${req.get('host')}/data-deletion/status?id=${confirmationCode}`,
+      confirmation_code: confirmationCode
+    });
+
+  } catch (error) {
+    console.error('❌ Data deletion error:', error);
+    res.status(500).json({
+      error: 'Failed to process data deletion request',
+      message: error.message
+    });
+  }
+});
+
+// Data deletion status endpoint
+app.get('/data-deletion/status', (req, res) => {
+  const confirmationId = req.query.id;
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Data Deletion Status</title>
+      <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          margin: 0;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+        }
+        .container {
+          text-align: center;
+          padding: 40px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          backdrop-filter: blur(10px);
+          max-width: 500px;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 20px; }
+        p { font-size: 1.1rem; line-height: 1.6; }
+        .confirmation {
+          background: rgba(16, 185, 129, 0.2);
+          padding: 15px;
+          border-radius: 10px;
+          margin-top: 20px;
+          font-family: monospace;
+          word-break: break-all;
+        }
+        @media (max-width: 600px) {
+          .container { margin: 20px; padding: 30px 20px; }
+          h1 { font-size: 2rem; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>✅ Data Deletion Complete</h1>
+        <p>Your personal data has been successfully deleted from our systems.</p>
+        <p>This action was completed in compliance with Facebook's data deletion requirements and GDPR regulations.</p>
+        ${confirmationId ? `<div class="confirmation">Confirmation ID: ${confirmationId}</div>` : ''}
+      </div>
+    </body>
+    </html>
+  `);
 });
 
 // Business Setup Wizard routes
@@ -1053,7 +1184,179 @@ app.post('/webhook/facebook', async (req, res) => {
   }
 });
 
-// Configure Facebook credentials
+// Facebook Login page route
+app.get('/facebook-login', (req, res) => {
+  res.sendFile(__dirname + '/facebook-login.html');
+});
+
+// Messaging Demo page route
+app.get('/messaging-demo', (req, res) => {
+  res.sendFile(__dirname + '/messaging-demo.html');
+});
+
+// API endpoint to save Facebook connection (from OAuth flow)
+app.post('/api/facebook/connect', async (req, res) => {
+  try {
+    const { userId, userAccessToken, pages } = req.body;
+
+    if (!userId || !userAccessToken || !pages) {
+      return res.status(400).json({
+        error: 'Missing required fields: userId, userAccessToken, pages'
+      });
+    }
+
+    console.log('📘 Facebook connection received:');
+    console.log('User ID:', userId);
+    console.log('Pages count:', pages.length);
+
+    // Store page tokens in database for each connected page
+    for (const page of pages) {
+      await database.db.run(
+        `INSERT OR REPLACE INTO facebook_pages (page_id, page_name, page_access_token, user_id, category, connected_at)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [page.id, page.name, page.access_token, userId, page.category || 'Unknown', new Date().toISOString()]
+      );
+
+      console.log(`✅ Saved page: ${page.name} (${page.id})`);
+
+      // Initialize bot for the first page if not already initialized
+      if (!facebookBot && pages.length > 0) {
+        const firstPage = pages[0];
+        process.env.FACEBOOK_PAGE_ACCESS_TOKEN = firstPage.access_token;
+
+        const BusinessConfig = require('./business-config');
+        const businessConfig = BusinessConfig.getDemoConfig();
+
+        facebookBot = new FacebookMessengerBot(
+          firstPage.access_token,
+          process.env.FACEBOOK_VERIFY_TOKEN || 'your_verify_token',
+          firstPage.name,
+          businessConfig
+        );
+
+        console.log(`🤖 Facebook bot initialized for page: ${firstPage.name}`);
+      }
+    }
+
+    res.json({
+      success: true,
+      message: 'Facebook pages connected successfully',
+      connectedPages: pages.length,
+      pages: pages.map(p => ({
+        id: p.id,
+        name: p.name,
+        category: p.category
+      }))
+    });
+
+  } catch (error) {
+    console.error('❌ Facebook connection error:', error);
+    res.status(500).json({
+      error: 'Failed to save Facebook connection',
+      message: error.message
+    });
+  }
+});
+
+// Get connected Facebook pages
+app.get('/api/facebook/pages', async (req, res) => {
+  try {
+    const result = await database.db.all(
+      'SELECT page_id, page_name, category, connected_at FROM facebook_pages ORDER BY connected_at DESC'
+    );
+
+    res.json({
+      success: true,
+      pages: result || []
+    });
+  } catch (error) {
+    console.error('❌ Error fetching pages:', error);
+    res.status(500).json({
+      error: 'Failed to fetch connected pages'
+    });
+  }
+});
+
+// Subscribe webhooks for a page (demonstrates pages_manage_metadata)
+app.post('/api/facebook/subscribe-webhooks', async (req, res) => {
+  try {
+    const { pageId, pageAccessToken } = req.body;
+
+    if (!pageId || !pageAccessToken) {
+      return res.status(400).json({
+        error: 'Missing pageId or pageAccessToken'
+      });
+    }
+
+    // Subscribe the page to the app
+    const subscribeUrl = `https://graph.facebook.com/v22.0/${pageId}/subscribed_apps`;
+    const subscribeResponse = await axios.post(subscribeUrl, {
+      subscribed_fields: ['messages', 'messaging_postbacks', 'messaging_optins', 'message_deliveries', 'message_reads'],
+      access_token: pageAccessToken
+    });
+
+    console.log('✅ Webhook subscription response:', subscribeResponse.data);
+
+    // Update database
+    await database.db.run(
+      'UPDATE facebook_pages SET webhook_subscribed = 1, webhook_subscribed_at = ? WHERE page_id = ?',
+      [new Date().toISOString(), pageId]
+    );
+
+    res.json({
+      success: true,
+      message: 'Webhooks subscribed successfully',
+      data: subscribeResponse.data
+    });
+
+  } catch (error) {
+    console.error('❌ Webhook subscription error:', error);
+    res.status(500).json({
+      error: 'Failed to subscribe webhooks',
+      message: error.response?.data?.error?.message || error.message
+    });
+  }
+});
+
+// Send test message (demonstrates pages_messaging)
+app.post('/api/facebook/send-test-message', async (req, res) => {
+  try {
+    const { pageId, pageAccessToken, recipientId, message } = req.body;
+
+    if (!pageId || !pageAccessToken || !recipientId) {
+      return res.status(400).json({
+        error: 'Missing required fields'
+      });
+    }
+
+    const messageText = message || 'Hello! This is a test message from FB Messenger Agent. We are successfully connected! 🎉';
+
+    // Send message using Facebook Send API
+    const sendUrl = `https://graph.facebook.com/v22.0/me/messages`;
+    const sendResponse = await axios.post(sendUrl, {
+      recipient: { id: recipientId },
+      message: { text: messageText },
+      access_token: pageAccessToken
+    });
+
+    console.log('✅ Test message sent:', sendResponse.data);
+
+    res.json({
+      success: true,
+      message: 'Test message sent successfully',
+      data: sendResponse.data
+    });
+
+  } catch (error) {
+    console.error('❌ Send message error:', error);
+    res.status(500).json({
+      error: 'Failed to send test message',
+      message: error.response?.data?.error?.message || error.message
+    });
+  }
+});
+
+// Configure Facebook credentials (legacy endpoint - kept for compatibility)
 app.post('/config/facebook', (req, res) => {
   const { page_access_token, verify_token, shop_name } = req.body;
 

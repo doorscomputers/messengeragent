@@ -48,3 +48,8 @@ ehthumbs.db
 
 # Railway
 .railway/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3

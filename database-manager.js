@@ -147,6 +147,20 @@ class DatabaseManager {
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )`,
 
+            // Facebook Pages (for OAuth and webhook management)
+            `CREATE TABLE IF NOT EXISTS facebook_pages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                page_id TEXT UNIQUE NOT NULL,
+                page_name TEXT NOT NULL,
+                page_access_token TEXT NOT NULL,
+                user_id TEXT NOT NULL,
+                category TEXT,
+                webhook_subscribed INTEGER DEFAULT 0,
+                webhook_subscribed_at DATETIME,
+                connected_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                last_activity DATETIME DEFAULT CURRENT_TIMESTAMP
+            )`,
+
             // Conversation Intelligence
             `CREATE TABLE IF NOT EXISTS conversation_insights (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
